@@ -16,3 +16,23 @@ This is an MVP for a software designed to improve door-to-door (D2D) lead genera
 Run the server:
 ```bash
 python app/main.py
+
+## Folder Structure
+/solar-d2d-mvp/
+│
+├── /app/                  # Main application folder
+│   ├── __init__.py        # Initializes the Python package
+│   ├── main.py            # Main entry point for the backend server
+│   ├── data_processing.py # Python script for data processing and route optimization
+│   ├── google_maps.py     # Python script for interacting with the Google Maps API
+│   ├── models.py          # Python script for data models (if using ORM)
+│   ├── database.py        # Python script for data storage management
+│   ├── /static/           # Folder for static files (CSS, JS)
+│   │   ├── style.css      # CSS for web app styling
+│   │   └── script.js      # JavaScript for web app interactivity (if needed)
+│   └── /templates/        # Folder for HTML templates
+│       └── index.html     # Main HTML page for the web interface
+│
+├── requirements.txt       # Dependencies for the project
+├── README.md              # Project documentation
+└── .gitignore             # Git ignore file for sensitive and unnecessary files
