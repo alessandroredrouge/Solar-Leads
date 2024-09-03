@@ -59,7 +59,7 @@ By having a map that determines the probability of conversion for each address (
 ## Analytics
 The software provides analytics of different types thanks to the collected data, from identifying the customer persona to tracking performances of the canvassers, estimating the efficacy of a specific sales pitch, identifying the best areas to canvass and so on...
 
-# High-Level Description of Data and Information Flow
+# Software Structure
 
 The software can be broken down into several key components that work together to collect, store, process, and visualize data. Here's an overview of the flow:
 
@@ -75,7 +75,7 @@ The software can be broken down into several key components that work together t
 
 5. **Feedback Loop for Continuous Improvement**: A system that allows user input and feedback to refine algorithms and improve data accuracy and efficiency over time.
 
-# Detailed Flow of Data and Information Through the Software
+# Detailed Description of Flow of Data and Information 
 
 Let's go through the data flow step-by-step, involving each element in your software structure:
 
