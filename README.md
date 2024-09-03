@@ -16,6 +16,7 @@ This is an MVP for a software designed to improve door-to-door (D2D) lead genera
 Run the server:
 ```bash
 python app/main.py
+```
 
 ## Folder Structure
 /solar-d2d-mvp/
