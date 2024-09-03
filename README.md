@@ -19,6 +19,7 @@ python app/main.py
 ```
 
 ## Folder Structure
+```bash
 /solar-d2d-mvp/
 │
 ├── /app/                  # Main application folder
@@ -37,3 +38,4 @@ python app/main.py
 ├── requirements.txt       # Dependencies for the project
 ├── README.md              # Project documentation
 └── .gitignore             # Git ignore file for sensitive and unnecessary files
+```
