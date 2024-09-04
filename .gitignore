@@ -1,0 +1,10 @@
+# Purpose: Specifies files and directories that Git should ignore. This typically includes files that are automatically generated or contain sensitive information (e.g., environment variables, database files).
+# Interacts with: The Git version control system.
+# Programming Language: Plain text.
+
+__pycache__/
+*.pyc
+*.sqlite3
+instance/
+.env
+.vscode/

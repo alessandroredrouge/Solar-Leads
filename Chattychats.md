@@ -114,3 +114,34 @@ Deploy your MVP to a small group of users (e.g., a team of canvassers) for testi
 - **Use Version Control**: Keep your code organized and manage changes using Git.
 - **Leverage Libraries and Frameworks**: Don't reinvent the wheel. Utilize Python libraries and frameworks to speed up development.
 - **Learn as You Go**: You'll inevitably face challenges and need to learn new concepts. Use these opportunities to deepen your understanding.
+
+
+## Additional Elements Outside of VS Code
+
+### Google Maps API Key
+
+- **Purpose**: Required for interacting with the Google Maps API to display maps and optimize routes.
+- **Setup**: You will need to sign up for a free Google Cloud account and generate an API key for Google Maps. You can start with the free tier, which should suffice for MVP development.
+- **Integration**: Store this key securely in an environment variable or a `.env` file and load it in your Python script (`google_maps.py`) using a library like `python-dotenv`.
+
+**Example Setup**:
+
+```bash
+# .env file
+GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+```
+Example Usage in Python:
+```bash
+python
+Copy code
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+```
+### Local SQLite Database (Optional)
+Purpose: For simplicity and zero cost, a local SQLite database will serve as the data storage solution. It avoids the need for cloud hosting while allowing you to use SQL queries for data manipulation.
+Setup: SQLite is lightweight and doesn't require a separate server installation. It's included with Python, so no additional setup is necessary.
+arduino
+Copy code

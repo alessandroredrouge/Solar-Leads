@@ -1,4 +1,4 @@
-# Solar D2D Lead Generation MVP
+# Solar D2D Lead Generation Tracker MVP
 
 This is an MVP for a software designed to improve door-to-door (D2D) lead generation for solar sales teams. It helps canvassers collect data, optimize routes, and analyze performance.
 
@@ -20,7 +20,7 @@ python app/main.py
 
 ## Folder Structure
 ```bash
-/solar-d2d-mvp/
+/solar-d2d-lead-gen-tracker-mvp/
 │
 ├── /app/                  # Main application folder
 │   ├── __init__.py        # Initializes the Python package
