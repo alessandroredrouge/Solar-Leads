@@ -3,10 +3,13 @@
 # Programming Language: Plain text.
 
 Flask>=2.2.5, <3.0.0
-pandas>=1.5.2, <2.0.0
+pandas==2.2.2
 requests>=2.32.0, <3.0.0
 SQLAlchemy>=1.4.31, <2.0.0
 python-dotenv>=0.19.2, <1.0.0
 gunicorn>=22.0.0, <23.0.0
+numpy==2.1.1
+tzdata>=2024.1
+
 
 

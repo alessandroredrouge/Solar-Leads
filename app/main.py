@@ -3,8 +3,8 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from data_processing import process_data
-from google_maps import get_map_data
+# from data_processing import process_data
+# from google_maps import get_map_data
 from database import init_db, save_data
 import os
 
