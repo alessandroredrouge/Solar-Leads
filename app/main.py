@@ -2,17 +2,17 @@
 # Interacts with: data_processing.py, google_maps.py, database.py, /templates/role_selection.html, /templates/data_collection.html, /templates/field_support.html, /templates/analytics.html.
 # Programming Language: Python (Flask).
 
-from flask import Flask, render_template, request, redirect, url_for, session
-# from data_processing import process_data
-# from google_maps import get_map_data
-# from database import init_db, save_data
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from data_processing import process_data
+from google_maps import get_map_data
+from database import init_db, save_data
 import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
 
 # Initialize the database from database.py
-# init_db()
+init_db()
 
 # Routes for Role Selection and Navigation
 @app.route('/')
@@ -38,7 +38,7 @@ def select_role():
         return redirect(url_for('manager_view'))
     return redirect(url_for('role_selection'))
 
-# Route for Canvasser View
+# Routes for Canvasser and Manager Views
 @app.route('/canvasser_view')
 def canvasser_view():
     """
@@ -46,7 +46,6 @@ def canvasser_view():
     """
     return render_template('canvasser_view.html')
 
-# Route for Manager View
 @app.route('/manager_view')
 def manager_view():
     """
@@ -54,7 +53,7 @@ def manager_view():
     """
     return render_template('manager_view.html')
 
-# Route for Data Collection Page
+# Routes for Data Collection, Field Support and Analytics Pages
 @app.route('/data_collection')
 def data_collection():
     """
@@ -65,7 +64,6 @@ def data_collection():
         return redirect(url_for('role_selection'))
     return render_template('data_collection.html')
 
-# Route for Field Support Page
 @app.route('/field_support')
 def field_support():
     """
@@ -76,7 +74,6 @@ def field_support():
         return redirect(url_for('role_selection'))
     return render_template('field_support.html')
 
-# Route for Analytics Page
 @app.route('/analytics')
 def analytics():
     """
@@ -86,6 +83,35 @@ def analytics():
     if 'role' not in session or session['role'] != 'Manager':
         return redirect(url_for('role_selection'))
     return render_template('analytics.html')
+
+# Routes for Data handling
+@app.route('/submit_data', methods=['POST'])
+def submit_data():
+    """
+    Handles the submission of data from the data collection form.
+    Processes and saves the data to the database.
+    """
+    collected_data = request.form.to_dict()  # Convert form data to dictionary
+    processed_data = process_data(collected_data)  # Process the data (ensure this returns a dict)
+    save_data(processed_data)  # Save processed data to CSV using pandas
+    flash('Data submitted successfully!', 'success')  # Optional: Feedback to user
+    return redirect(url_for('data_collection'))  # Redirect back to data collection page
+
+# Routes for Google Maps Data
+@app.route('/get_map')
+def get_map():
+    """
+    Retrieves and displays map data using Google Maps API.
+    """
+    map_data = get_map_data()  # Function from google_maps.py
+    return render_template('map.html', map_data=map_data)  # You'll need to create map.html
+
+# Routes for Error Handling and User Feedback
+@app.errorhandler(404)
+def page_not_found(e):
+    flash('Page not found!')
+    return redirect(url_for('role_selection'))
+
 
 # Run the Flask application
 if __name__ == '__main__':
