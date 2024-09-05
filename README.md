@@ -4,7 +4,7 @@ This is an MVP for a software designed to improve door-to-door (D2D) lead genera
 
 ## Features
 - Data collection from door-to-door interactions
-- Optimized canvassing routes using Google Maps API
+- Support to canvassers in terms of ad-hoc maps and suggestions of optimal canvassing routes
 - Analytics dashboard for performance tracking
 
 ## Installation
