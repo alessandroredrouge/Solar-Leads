@@ -108,7 +108,7 @@ dmypy.json
 .pyre/
 
 # CSV file to avoid leaking personal information
-.csv
+*.csv
 
 # End of file
 
