@@ -7,6 +7,7 @@ from data_processing import process_data
 from google_maps import get_map_data
 from database import init_db, save_data
 import os
+import csv
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
@@ -62,7 +63,17 @@ def data_collection():
     """
     if 'role' not in session:
         return redirect(url_for('role_selection'))
-    return render_template('data_collection.html')
+    
+    # Load data from CSV file if it exists
+    data = []
+    file_path = 'field_data.csv'
+    if os.path.exists(file_path):
+        with open(file_path, newline='', encoding='utf-8') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader)  # Skip the header row
+            data = list(reader)  # Get the data from the CSV fil
+
+    return render_template('data_collection.html', data=data)
 
 @app.route('/field_support')
 def field_support():

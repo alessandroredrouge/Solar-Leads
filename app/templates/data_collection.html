@@ -31,11 +31,11 @@
                     <option value="">--Select a response--</option>
                     <option value="No answer">No answer</option>
                     <option value="Direct no (Homeowner)">Direct no (Homeowner)</option>
-                    <option value="Direct no (Renters)">Direct no (Renters)</option>
+                    <option value="Direct no (Renter)">Direct no (Renter)</option>
                     <option value="Return later">Return later</option>
-                    <option value="Initial conversations">Initial conversations</option>
-                    <option value="Detailed conversations">Detailed conversations</option>
-                    <option value="Appointments set">Appointments set</option>
+                    <option value="Initial conversation">Initial conversation</option>
+                    <option value="Detailed conversation">Detailed conversation</option>
+                    <option value="Appointment set">Appointment set</option>
                     <option value="Undefined">Undefined</option>
                 </select>
             </div>
@@ -44,6 +44,7 @@
                 <label for="reason_of_no">Reason for 'No' (if applicable)</label>
                 <select id="reason_of_no" name="reason_of_no">
                     <option value="">--Select a reason--</option>
+                    <option value="Reason not provided">Reason not provided</option>
                     <option value="Already got solar panels on rooftop">Already got solar panels on rooftop</option>
                     <option value="Does not make economical sense">Does not make economical sense</option>
                     <option value="Electricity bill is already low">Electricity bill is already low</option>
@@ -104,6 +105,42 @@
             <!-- Submit Button -->
             <button type="submit">Submit Data</button>
         </form>
+        
+        <!-- Add the table to display CSV data -->
+        <h2>Collected Data</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Address</th>
+                    <th>Timestamp</th>
+                    <th>Prospect Response</th>
+                    <th>Reason for 'No'</th>
+                    <th>Electricity Bill Estimate</th>
+                    <th>Approximate Age</th>
+                    <th>Presumed Gender</th>
+                    <th>Presumed Family Status</th>
+                    <th>Solar Panels on Roof (Y/N)</th>
+                    <th>House Characteristics</th>
+                    <th>Interest Level</th>
+                    <th>Additional Notes / Comments</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if data %}
+                    {% for row in data %}
+                        <tr>
+                            {% for cell in row %}
+                                <td>{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="12">No data available yet.</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
