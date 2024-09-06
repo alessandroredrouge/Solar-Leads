@@ -109,6 +109,7 @@ dmypy.json
 
 # CSV file to avoid leaking personal information
 *.csv
+field_data.csv
 
 # End of file
 
