@@ -29,7 +29,7 @@ def save_data(data):
     df = pd.read_csv(CSV_FILE_PATH)
 
     # Append the new data as a new row
-    df = df.append(data, ignore_index=True)
+    df = pd.concat([df, pd.DataFrame([data])], ignore_index=True)
 
     # Save the updated DataFrame back to the CSV file
     df.to_csv(CSV_FILE_PATH, index=False)
