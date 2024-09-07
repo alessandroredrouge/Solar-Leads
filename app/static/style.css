@@ -72,3 +72,12 @@ table, th, td {
     border: 1px solid #ccc;
     padding: 10px;
 }
+
+/* Sticky Table Headers */
+table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f0f4f8; /* Background color for the headers */
+    z-index: 2; /* Ensures the header stays on top */
+    padding: 10px; /* Optional, adds padding to header cells */
+}
