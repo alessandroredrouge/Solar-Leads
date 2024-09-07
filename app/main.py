@@ -103,7 +103,6 @@ def submit_data():
     Processes and saves the data to the database.
     """
     collected_data = request.form.to_dict()  # Convert form data to dictionary
-    # processed_data = process_data(collected_data)  # Process the data (ensure this returns a dict)
     save_data(collected_data)  # Save processed data to CSV using pandas
     flash('Data submitted successfully!', 'success')  # Optional: Feedback to user
     return redirect(url_for('data_collection'))  # Redirect back to data collection page
