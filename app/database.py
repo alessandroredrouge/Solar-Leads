@@ -14,7 +14,7 @@ def init_db():
     if not os.path.exists(CSV_FILE_PATH):
         # Define the initial structure of the CSV file
         df = pd.DataFrame(columns=[
-            'address', 'timestamp', 'prospect_response', 'reason_of_no',
+            'Prospect ID', 'address', 'timestamp', 'prospect_response', 'reason_of_no',
             'electricity_bill_estimate', 'approximate_age', 'presumed_gender',
             'presumed_family_status', 'solar_panels_on_roof', 'house_characteristics',
             'interest_level', 'additional_notes'
@@ -27,9 +27,22 @@ def init_db():
 def save_data(data):
     # Load the existing data from the CSV file
     df = pd.read_csv(CSV_FILE_PATH)
+    
+    # Determine the next Prospect ID by finding the max ID and incrementing it
+    if len(df) > 0:
+        next_id = df['Prospect ID'].max() + 1
+    else:
+        next_id = 1
+
+    # Assign the new Prospect ID to the data
+    new_data=pd.DataFrame([data])
+    new_data.insert(0, 'Prospect ID', next_id)
 
     # Append the new data as a new row
-    df = pd.concat([pd.DataFrame([data]), df], ignore_index=True)
+    df = pd.concat([df,new_data], ignore_index=True)
+
+    # Sort the DataFrame so that the most recent data (highest Prospect ID) is at the top
+    df = df.sort_values(by='Prospect ID', ascending=False)
 
     # Save the updated DataFrame back to the CSV file
     df.to_csv(CSV_FILE_PATH, index=False)

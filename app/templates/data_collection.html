@@ -105,11 +105,11 @@
         <button id="toggle-form">Hide Form</button>
         
         <!-- Add the table to display CSV data -->
-         <!-- TODO fix the header to the top when scrolling down -->
         <h2>Collected Data</h2>
         <table border="1">
             <thead>
                 <tr>
+                    <th>Prospect ID</th>
                     <th>Address</th>
                     <th>Timestamp</th>
                     <th>Prospect Response</th>
@@ -134,7 +134,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="12">No data available yet.</td>
+                            <td colspan="13">No data available yet.</td>
                         </tr>
                     {% endfor %}
                 {% endif %}
