@@ -9,13 +9,27 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
+<!-- Navbar -->
+<nav id="navbar">
+    <ul>
+        <!-- Show the role on the left side -->
+        <li style="float: left; background-color: #007bff; color: white; padding: 14px 16px; list-style: none;">
+            Role: {{ role }}
+        </li>
+
+        <!-- Menu links to the other pages -->
+        <li style="float: right;"><a href="{{ url_for('data_collection') }}">Data Collection</a></li>
+        <li style="float: right;"><a href="{{ url_for('field_support') }}">Field Support</a></li>
+        {% if role == 'Manager' %}
+        <li style="float: right;"><a href="{{ url_for('analytics') }}">Analytics</a></li>
+        {% endif %}
+        <li style="float: right;"><a href="{{ url_for('role_selection') }}">Change Role</a></li>
+    </ul>
+</nav>
 <body>
-    <!-- <div class="flex-container form-container"
-        <h1>Data Collection Page</h1>
-    </div> -->
+
     <div class="flex-container">
         <h1>Data Collection Page</h1> 
-        
         <div class="form-section">
             <h2>Submission Form</h2>
             <p>Please fill out the form below. Fields marked with an asterisk (*) are mandatory.</p>

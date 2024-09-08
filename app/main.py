@@ -2,7 +2,7 @@
 # Interacts with: data_processing.py, google_maps.py, database.py, /templates/role_selection.html, /templates/data_collection.html, /templates/field_support.html, /templates/analytics.html.
 # Programming Language: Python (Flask).
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
 from data_processing import process_data
 from google_maps import get_map_data
 from database import init_db, save_data, delete_data
@@ -15,44 +15,22 @@ app.secret_key = os.urandom(24)  # Secret key for session management
 # Initialize the database from database.py
 init_db()
 
-# Routes for Role Selection and Navigation
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def role_selection():
-    """
-    Renders the role selection page where users can choose their role as either Canvasser or Manager.
-    """
-    return render_template('role_selection.html')
-
-@app.route('/select_role', methods=['POST'])
-def select_role():
     """
     Handles the role selection form submission. Sets the user role in the session
     and redirects the user to the appropriate page based on the selected role.
     """
-    selected_role = request.form['role']  # Get the role selected by the user
-    session['role'] = selected_role  # Store the role in the session
-
-    # Redirect to role-specific view
-    if selected_role == 'Canvasser':
-        return redirect(url_for('canvasser_view'))
-    elif selected_role == 'Manager':
-        return redirect(url_for('manager_view'))
-    return redirect(url_for('role_selection'))
-
-# Routes for Canvasser and Manager Views
-@app.route('/canvasser_view')
-def canvasser_view():
-    """
-    Renders the Canvasser view template.
-    """
-    return render_template('canvasser_view.html')
-
-@app.route('/manager_view')
-def manager_view():
-    """
-    Renders the Manager view template.
-    """
-    return render_template('manager_view.html')
+    if request.method == 'POST':
+        selected_role = request.form['role']  # Get the role selected by the user
+        session['role'] = selected_role  # Store the role in the session
+        # Redirect to role-specific view
+        if selected_role == 'Canvasser':
+            return redirect(url_for('data_collection'))
+        elif selected_role == 'Manager':
+            return redirect(url_for('analytics'))
+        
+    return render_template('role_selection.html')
 
 # Routes for Data Collection, Field Support and Analytics Pages
 @app.route('/data_collection')
@@ -61,7 +39,8 @@ def data_collection():
     Renders the Data Collection page.
     Only accessible to users who have selected a role.
     """
-    if 'role' not in session:
+    role = session.get('role')
+    if not role:
         return redirect(url_for('role_selection'))
     
     # Load data from CSV file if it exists
@@ -73,7 +52,7 @@ def data_collection():
             next(reader)  # Skip the header row because we render it directly in the HTML template
             data = list(reader)  # Get the data from the CSV file
 
-    return render_template('data_collection.html', data=data)
+    return render_template('data_collection.html', data=data, role=role)
 
 @app.route('/field_support')
 def field_support():
@@ -81,9 +60,10 @@ def field_support():
     Renders the Field Support page.
     Only accessible to users who have selected a role.
     """
-    if 'role' not in session:
+    role = session.get('role')
+    if not role:
         return redirect(url_for('role_selection'))
-    return render_template('field_support.html')
+    return render_template('field_support.html', role=role)
 
 @app.route('/analytics')
 def analytics():
@@ -91,9 +71,10 @@ def analytics():
     Renders the Analytics page.
     Only accessible to Managers.
     """
-    if 'role' not in session or session['role'] != 'Manager':
-        return redirect(url_for('role_selection'))
-    return render_template('analytics.html')
+    role = session.get('role')
+    if not role or role != 'Manager':
+        return redirect(url_for('role_selection'))  # Only accessible for managers
+    return render_template('analytics.html', role=role)
 
 # Routes for Data handling
 @app.route('/submit_data', methods=['POST'])

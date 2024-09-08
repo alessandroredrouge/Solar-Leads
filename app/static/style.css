@@ -17,6 +17,7 @@ body {
     justify-content: center;
     align-items: flex-start;
     height: 100vh;
+    margin-top: 80px;
 }
 
 /* Header Styling */
@@ -76,7 +77,7 @@ table, td {
 table thead th {
     position: sticky;
     border: 1px solid #ccc;
-    top: 0;
+    top: 65px;
     background-color: #f0f4f8;
     z-index: 2;
     padding: 10px;
@@ -119,4 +120,50 @@ tr:hover .delete-btn {
 
 .delete-btn:hover {
     background-color: #9c1500;
+}
+
+#navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #f0f4f8;
+    padding: 1rem;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    display: flex;  /* This ensures the items are aligned horizontally */
+    justify-content: space-between;  /* Distributes the links evenly */
+    align-items: center;  /* Aligns the items in the center vertically */
+    width: 100%;  /* Full-width for the navbar */
+    box-sizing: border-box; /* Ensure padding and borders are included in the width */
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    float: right;
+}
+
+nav ul li a:hover {
+    background-color: #111;
+}
+
+nav ul li:first-child {
+    float: left;
+    background-color: #007bff;
+    color: white;
+    padding: 14px 16px;
+    list-style: none;
 }
