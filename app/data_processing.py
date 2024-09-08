@@ -2,4 +2,5 @@
 # Interacts with: database.py (to retrieve data), google_maps.py (to send processed data for route optimization).
 # Programming Language: Python.
 
+# TODO: create the structure to process the collected data
 process_data= None
