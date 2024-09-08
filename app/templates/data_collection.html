@@ -13,8 +13,9 @@
 <nav id="navbar">
     <ul>
         <!-- Show the role on the left side -->
-        <li style="float: left; background-color: #007bff; color: white; padding: 14px 16px; list-style: none;">
-            Role: {{ role }}
+        <li style="float: left; background-color: #007bff; color: white; padding: 8px 25px; list-style: none;">
+            <div> Role: {{ role }} </div>
+            <div> Nickname: {{ nickname }} </div>
         </li>
 
         <!-- Menu links to the other pages -->
@@ -108,8 +109,14 @@
                     <input type="text" id="house_characteristics" name="house_characteristics">
                 </div>
                 <div class="form-group">
-                    <label for="interest_level">Interest Level</label>
-                    <input type="text" id="interest_level" name="interest_level">
+                    <label for="interest_level">Interest level</label>
+                    <select id="interest_level" name="interest_level">
+                        <option value="">--Select an interest level--</option>
+                        <option value="No interest">No interest</option>
+                        <option value="Low interest">Low interest</option>
+                        <option value="Medium interest">Medium interest</option>
+                        <option value="High interest">High interest</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="additional_notes">Additional Notes / Comments</label>
@@ -142,6 +149,7 @@
                     <th>House Characteristics</th>
                     <th>Interest Level</th>
                     <th>Additional Notes / Comments</th>
+                    <th>Submitted by</th>
                 </tr>
             </thead>
             <tbody>
@@ -157,7 +165,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="13">No data available yet.</td>
+                            <td colspan="14">No data available yet.</td>
                         </tr>
                     {% endfor %}
                 {% endif %}

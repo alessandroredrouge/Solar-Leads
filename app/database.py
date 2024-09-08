@@ -17,14 +17,14 @@ def init_db():
             'Prospect ID', 'address', 'timestamp', 'prospect_response', 'reason_of_no',
             'electricity_bill_estimate', 'approximate_age', 'presumed_gender',
             'presumed_family_status', 'solar_panels_on_roof', 'house_characteristics',
-            'interest_level', 'additional_notes'
+            'interest_level', 'additional_notes', 'Submitted by'
         ])
         # Save the empty DataFrame to a CSV file
         df.to_csv(CSV_FILE_PATH, index=False)
         print(f"Initialized new database at {CSV_FILE_PATH}")
 
 # Function to save new data into the CSV file
-def save_data(data):
+def save_data(data, role, nickname):
     # Load the existing data from the CSV file
     df = pd.read_csv(CSV_FILE_PATH)
     
@@ -33,10 +33,10 @@ def save_data(data):
         next_id = df['Prospect ID'].max() + 1
     else:
         next_id = 1
-
     # Assign the new Prospect ID to the data
     new_data=pd.DataFrame([data])
     new_data.insert(0, 'Prospect ID', next_id)
+    new_data['Submitted by'] = f'{role} {nickname}'
 
     # Append the new data as a new row
     df = pd.concat([df,new_data], ignore_index=True)

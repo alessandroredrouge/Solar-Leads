@@ -23,7 +23,9 @@ def role_selection():
     """
     if request.method == 'POST':
         selected_role = request.form['role']  # Get the role selected by the user
+        selected_nickname = request.form['nickname']  # Get the nickname selected by the user
         session['role'] = selected_role  # Store the role in the session
+        session['nickname'] = selected_nickname  # Store the nickname in the session
         # Redirect to role-specific view
         if selected_role == 'Canvasser':
             return redirect(url_for('data_collection'))
@@ -40,6 +42,7 @@ def data_collection():
     Only accessible to users who have selected a role.
     """
     role = session.get('role')
+    nickname = session.get('nickname')
     if not role:
         return redirect(url_for('role_selection'))
     
@@ -52,7 +55,7 @@ def data_collection():
             next(reader)  # Skip the header row because we render it directly in the HTML template
             data = list(reader)  # Get the data from the CSV file
 
-    return render_template('data_collection.html', data=data, role=role)
+    return render_template('data_collection.html', data=data, role=role, nickname=nickname)
 
 @app.route('/field_support')
 def field_support():
@@ -61,9 +64,10 @@ def field_support():
     Only accessible to users who have selected a role.
     """
     role = session.get('role')
+    nickname = session.get('nickname')
     if not role:
         return redirect(url_for('role_selection'))
-    return render_template('field_support.html', role=role)
+    return render_template('field_support.html', role=role, nickname=nickname)
 
 @app.route('/analytics')
 def analytics():
@@ -72,9 +76,10 @@ def analytics():
     Only accessible to Managers.
     """
     role = session.get('role')
+    nickname = session.get('nickname')
     if not role or role != 'Manager':
         return redirect(url_for('role_selection'))  # Only accessible for managers
-    return render_template('analytics.html', role=role)
+    return render_template('analytics.html', role=role, nickname=nickname)
 
 # Routes for Data handling
 @app.route('/submit_data', methods=['POST'])
@@ -83,8 +88,10 @@ def submit_data():
     Handles the submission of data from the data collection form.
     Processes and saves the data to the database.
     """
+    role = session.get('role')
+    nickname = session.get('nickname')
     collected_data = request.form.to_dict()  # Convert form data to dictionary
-    save_data(collected_data)  # Save processed data to CSV using pandas
+    save_data(collected_data, role, nickname)  # Save processed data to CSV using pandas
     flash('Data submitted successfully!', 'success')  # Optional: Feedback to user
     return redirect(url_for('data_collection'))  # Redirect back to data collection page
 
