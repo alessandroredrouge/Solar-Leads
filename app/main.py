@@ -2,10 +2,10 @@
 # Interacts with: data_processing.py, google_maps.py, database.py, /templates/role_selection.html, /templates/data_collection.html, /templates/field_support.html, /templates/analytics.html.
 # Programming Language: Python (Flask).
 
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from data_processing import process_data
 from google_maps import get_map_data
-from database import init_db, save_data
+from database import init_db, save_data, delete_data
 import os
 import csv
 
@@ -70,8 +70,8 @@ def data_collection():
     if os.path.exists(file_path):
         with open(file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
-            next(reader)  # Skip the header row
-            data = list(reader)  # Get the data from the CSV fil
+            next(reader)  # Skip the header row because we render it directly in the HTML template
+            data = list(reader)  # Get the data from the CSV file
 
     return render_template('data_collection.html', data=data)
 
@@ -107,6 +107,16 @@ def submit_data():
     flash('Data submitted successfully!', 'success')  # Optional: Feedback to user
     return redirect(url_for('data_collection'))  # Redirect back to data collection page
 
+@app.route('/delete/<int:prospect_id>', methods=['DELETE'])
+def delete_prospect(prospect_id):
+    """
+    Handles the deletion of a row of data from the data stored so far.
+    Processes and deletes the row of data indicated by the user from the database.
+    """
+    delete_data(prospect_id)
+    flash('Data eliminated successfully!', 'success')  # Optional: Feedback to user 
+    return jsonify({'success': True}), 200
+  
 # Routes for Google Maps Data
 @app.route('/get_map')
 def get_map():
@@ -121,7 +131,6 @@ def get_map():
 def page_not_found(e):
     flash('Page not found!')
     return redirect(url_for('role_selection'))
-
 
 # Run the Flask application
 if __name__ == '__main__':

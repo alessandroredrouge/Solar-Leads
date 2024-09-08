@@ -26,12 +26,10 @@ h1 {
     margin-bottom: 10px;
 }
 
-/* Header Styling */
 h2 {
     font-size: 1.5rem;
     color: #000000;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    margin: 15px 0 10px;
 }
 
 /* Button Styling */
@@ -44,7 +42,7 @@ button {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin: 5px 0; /* This adds 5px space above and below the button */
+    margin: 5px 0;
 }
 
 button:hover {
@@ -56,28 +54,69 @@ button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
     text-align: center;
 }
 
 /* Table Styling */
 table {
-    width: 95%; /* Ensure the table stretches the full width of the container */
-    text-align: center; /* Keep text aligned left for better readability */
-    margin-top: 5px; /* Add some space between the form and the table */
+    width: 95%;
+    text-align: center;
+    margin-top: 5px;
     border-collapse: collapse;
 }
 
-table, th, td {
+table, td {
     border: 1px solid #ccc;
     padding: 10px;
+    border-left: none;
+    border-top: none;
 }
 
 /* Sticky Table Headers */
 table thead th {
     position: sticky;
+    border: 1px solid #ccc;
     top: 0;
-    background-color: #f0f4f8; /* Background color for the headers */
-    z-index: 2; /* Ensures the header stays on top */
-    padding: 10px; /* Optional, adds padding to header cells */
+    background-color: #f0f4f8;
+    z-index: 2;
+    padding: 10px;
+}
+
+/* Specific Styling for the first column (Delete Button) */
+table thead th:first-child {
+    border-top: none !important;
+    border-left: none; /* Ensures no left border on the header of the delete column */
+    border-bottom: none; /* Ensures no bottom border on the header */
+}
+
+.delete-cell-column {
+    width: 40px;
+    padding: 0;
+    margin: 0;
+    border-top: none !important;
+    border-left: none;
+    border-bottom: none !important;
+}
+
+/* Delete button styles */
+.delete-btn {
+    display: none;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 auto;
+}
+
+/* Show delete button when hovering over the row */
+tr:hover .delete-btn {
+    display: block;
+}
+
+.delete-btn:hover {
+    background-color: #9c1500;
 }

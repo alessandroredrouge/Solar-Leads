@@ -2,6 +2,7 @@
 // Interacts with: all HTML files in the app/templates directory.
 // Programming Language: JavaScript.
 
+// Functioning of the Hide / Unhide Form button in the Submission Form of data_collection.html
 document.addEventListener('DOMContentLoaded', function() {
     const formSection = document.querySelector('.form-section');
     const toggleButton = document.getElementById('toggle-form');
@@ -14,6 +15,35 @@ document.addEventListener('DOMContentLoaded', function() {
             formSection.style.display = 'none';
             toggleButton.textContent = 'Unhide Form';
         }
+    });
+});
+
+// Functioning of the Delete buttons in the Collected Data table of data_collection.html
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to delete buttons
+    document.querySelectorAll('.delete-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const prospectId = this.getAttribute('data-id');
+
+            // Confirm with the user before deleting
+            if (confirm('Are you sure you want to delete this record?')) {
+                // Send a DELETE request to the server
+                fetch(`/delete/${prospectId}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page after deletion
+                        window.location.reload();
+                    } else {
+                        console.error('Failed to delete prospect.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during deletion:', error);
+                });
+            }
+        });
     });
 });
 

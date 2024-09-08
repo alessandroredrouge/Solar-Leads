@@ -48,6 +48,26 @@ def save_data(data):
     df.to_csv(CSV_FILE_PATH, index=False)
     print("Data saved successfully.")
 
+# Function to eliminate a specific row of data from the CSV file
+def delete_data(prospect_id):
+    # Load the existing data from the CSV file
+    df = pd.read_csv(CSV_FILE_PATH)
+
+    # Find and delete the row with the given Prospect ID
+    df = df[df['Prospect ID'] != prospect_id]
+
+    # Recalculate the Prospect IDs after deletion
+    df = df.sort_values(by='Prospect ID', ascending=True).reset_index(drop=True)
+    df['Prospect ID'] = range(1, len(df) + 1)
+
+    # Sort by the updated Prospect IDs so that the most recent is on top
+    df = df.sort_values(by='Prospect ID', ascending=False)
+
+    # Save the updated DataFrame back to the CSV file
+    df.to_csv(CSV_FILE_PATH, index=False)
+    print("Data deleted successfully.")
+    
+
 # Function to load data from the CSV file
 def load_data():
     # Check if the CSV file exists
