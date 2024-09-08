@@ -81,8 +81,13 @@
                     <input type="text" id="presumed_family_status" name="presumed_family_status">
                 </div>
                 <div class="form-group">
-                    <label for="solar_panels_on_roof">Solar Panels on Roof (Y/N)</label>
-                    <input type="text" id="solar_panels_on_roof" name="solar_panels_on_roof">
+                    <label for="solar_panels_on_roof">Solar Panels on Roof</label>
+                    <select id="solar_panels_on_roof" name="solar_panels_on_roof">
+                        <option value="">--Select an option--</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Unknown">Unknown</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="house_characteristics">House Characteristics</label>
@@ -109,6 +114,7 @@
         <table border="1">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Prospect ID</th>
                     <th>Address</th>
                     <th>Timestamp</th>
@@ -118,7 +124,7 @@
                     <th>Approximate Age</th>
                     <th>Presumed Gender</th>
                     <th>Presumed Family Status</th>
-                    <th>Solar Panels on Roof (Y/N)</th>
+                    <th>Solar Panels on Roof</th>
                     <th>House Characteristics</th>
                     <th>Interest Level</th>
                     <th>Additional Notes / Comments</th>
@@ -128,6 +134,9 @@
                 {% if data %}
                     {% for row in data %}
                         <tr>
+                            <td class="delete-cell-column">
+                                <button class="delete-btn" data-id="{{ row[0] }}">X</button>
+                            </td>
                             {% for cell in row %}
                                 <td>{{ cell }}</td>
                             {% endfor %}
