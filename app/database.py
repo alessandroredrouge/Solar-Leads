@@ -66,7 +66,19 @@ def delete_data(prospect_id):
     # Save the updated DataFrame back to the CSV file
     df.to_csv(CSV_FILE_PATH, index=False)
     print("Data deleted successfully.")
+
+# Function to eliminate ALL data from the CSV file
+def delete_ALL_data():
+     # Load the existing data from the CSV file and get the header (first row)
+    df = pd.read_csv(CSV_FILE_PATH)
+    header = df.columns.tolist()
     
+    # Create an empty DataFrame with only the header
+    empty_df = pd.DataFrame(columns=header)
+    
+    # Save the empty DataFrame back to the CSV file, keeping only the header
+    empty_df.to_csv(CSV_FILE_PATH, index=False)
+    print("All data deleted successfully.")
 
 # Function to load data from the CSV file
 def load_data():

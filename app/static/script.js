@@ -47,4 +47,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-
+// Functioning of the Delete ALL button in the Collected Data table of data_collection.html
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener to delete all button
+    document.querySelectorAll('.delete-all-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            // Confirm with the user before deleting
+            if (confirm('Are you REEEEEAAAALLY sure you want to delete this record? Cmon man, think about it!')) {
+                // Send a DELETE request to the server
+                fetch(`/delete-ALL`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page after deletion
+                        window.location.reload();
+                    } else {
+                        console.error('Failed to delete prospect.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error during deletion:', error);
+                });
+            }
+        });
+    });
+});

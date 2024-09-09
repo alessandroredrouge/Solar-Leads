@@ -90,6 +90,7 @@ table thead th:first-child {
     border-bottom: none; /* Ensures no bottom border on the header */
 }
 
+/* First column for Delete buttons styling */
 .delete-cell-column {
     width: 40px;
     padding: 0;
@@ -113,7 +114,6 @@ table thead th:first-child {
     margin: 0 auto;
 }
 
-/* Show delete button when hovering over the row */
 tr:hover .delete-btn {
     display: block;
 }
@@ -122,6 +122,25 @@ tr:hover .delete-btn {
     background-color: #9c1500;
 }
 
+/* Delete all button style */
+.delete-all-btn {
+    display: block;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 auto;
+}
+
+.delete-all-btn:hover {
+    background-color: #9c1500;
+}
+
+/* Navbar styling */
 #navbar {
     position: fixed;
     top: 0;

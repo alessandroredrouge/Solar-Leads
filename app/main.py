@@ -5,7 +5,7 @@
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
 from data_processing import process_data
 from google_maps import get_map_data
-from database import init_db, save_data, delete_data
+from database import init_db, save_data, delete_data, delete_ALL_data
 import os
 import csv
 
@@ -103,6 +103,16 @@ def delete_prospect(prospect_id):
     """
     delete_data(prospect_id)
     flash('Data eliminated successfully!', 'success')  # Optional: Feedback to user 
+    return jsonify({'success': True}), 200
+
+@app.route('/delete-ALL', methods=['DELETE'])
+def delete_table():
+    """
+    Handles the deletion of a row of data from the data stored so far.
+    Processes and deletes the row of data indicated by the user from the database.
+    """
+    delete_ALL_data()
+    flash('All data eliminated successfully!', 'success')  # Optional: Feedback to user 
     return jsonify({'success': True}), 200
   
 # Routes for Google Maps Data
