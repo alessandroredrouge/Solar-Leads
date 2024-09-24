@@ -12,10 +12,19 @@
     <div class="flex-container">
         <h1>Select Your Role</h1>
         <form action="{{ url_for('role_selection') }}" method="post">
-            <div class="form-group">
-                <button type="submit" name="role" value="Canvasser">Canvasser</button>
-                <button type="submit" name="role" value="Team Leader">Team Leader</button>
-                <button type="submit" name="role" value="Manager">Manager</button>
+            <div class="role-selection" style="display: flex; justify-content: center; gap: 20px;">
+                <div class="role-option" style="text-align: center;">
+                    <img src="{{ url_for('static', filename='images/canvasser.png') }}" alt="Canvasser" style="width: 100px; height: 100px; margin-bottom: 10px;">
+                    <button type="submit" name="role" value="Canvasser" style="width: 300px">Canvasser</button>
+                </div>
+                <div class="role-option" style="text-align: center;">
+                    <img src="{{ url_for('static', filename='images/team_leader.png') }}" alt="Team Leader" style="width: 100px; height: 100px; margin-bottom: 10px;">
+                    <button type="submit" name="role" value="Team Leader" style="width: 300px">Team Leader</button>
+                </div>
+                <div class="role-option" style="text-align: center;">
+                    <img src="{{ url_for('static', filename='images/manager.png') }}" alt="Manager" style="width: 100px; height: 100px; margin-bottom: 10px;">
+                    <button type="submit" name="role" value="Manager" style="width: 300px">Manager</button>
+                </div>
             </div>
             <div class="form-group">
                 <label for="nickname">Nickname</label>
