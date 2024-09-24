@@ -29,6 +29,8 @@ def role_selection():
         # Redirect to role-specific view
         if selected_role == 'Canvasser':
             return redirect(url_for('data_collection'))
+        elif selected_role == 'Team Leader':
+            return redirect(url_for('prospect_qualification'))
         elif selected_role == 'Manager':
             return redirect(url_for('analytics'))
         
@@ -39,12 +41,12 @@ def role_selection():
 def data_collection():
     """
     Renders the Data Collection page.
-    Only accessible to users who have selected a role.
+    Only accessible to Canvassers and Team Leaders.
     """
     role = session.get('role')
     nickname = session.get('nickname')
-    if not role:
-        return redirect(url_for('role_selection'))
+    if not role or role == 'Manager':
+        return redirect(url_for('role_selection')) # only accessible for canvassers and team leaders
     
     # Load data from CSV file if it exists
     data = []
@@ -61,13 +63,25 @@ def data_collection():
 def field_support():
     """
     Renders the Field Support page.
-    Only accessible to users who have selected a role.
+    Only accessible to Canvassers and Team Leaders.
     """
     role = session.get('role')
     nickname = session.get('nickname')
-    if not role:
-        return redirect(url_for('role_selection'))
+    if not role or role == 'Manager':
+        return redirect(url_for('role_selection')) # only accessible for canvassers and team leaders
     return render_template('field_support.html', role=role, nickname=nickname)
+
+@app.route('/prospect_qualification')
+def prospect_qualification():
+    """
+    Renders the Prospect Qualification page.
+    Only accessible to Team Leaders and Managers.
+    """
+    role = session.get('role')
+    nickname = session.get('nickname')
+    if not role or role == 'Canvasser':
+        return redirect(url_for('role_selection'))  # Only accessible for team leaders and managers
+    return render_template('prospect_qualification.html', role=role, nickname=nickname)
 
 @app.route('/analytics')
 def analytics():

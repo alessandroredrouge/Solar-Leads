@@ -18,8 +18,15 @@
         </li>
 
         <!-- Menu links to the other pages -->
+        {% if role != 'Manager' %}
         <li style="float: right;"><a href="{{ url_for('data_collection') }}">Data Collection</a></li>
+        {% endif %}
+        {% if role != 'Manager' %}
         <li style="float: right;"><a href="{{ url_for('field_support') }}">Field Support</a></li>
+        {% endif %}
+        {% if role != 'Canvasser' %}
+        <li style="float: right;"><a href="{{ url_for('prospect_qualification') }}">Prospect Qualification</a></li>
+        {% endif %}
         {% if role == 'Manager' %}
         <li style="float: right;"><a href="{{ url_for('analytics') }}">Analytics</a></li>
         {% endif %}

@@ -18,7 +18,7 @@ Run the server:
 python app/main.py
 ```
 
-## Folder Structure
+## Folder Structure #TODO update file structure
 ```bash
 /solar-d2d-lead-gen-tracker-mvp/
 │
