@@ -73,3 +73,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Adding the current time and date to the Submission Form of data_collection.html, still allowing to modify it if necessary
+document.addEventListener('DOMContentLoaded', function() {
+    const timestampInput = document.getElementById('timestamp');
+    // Get the current date and time
+    const now = new Date();
+    // Adjust for local timezone offset to get the correct local time
+    const timezoneOffset = now.getTimezoneOffset() * 60000; // in milliseconds
+    const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, -1);
+    // Format the date and time for the datetime-local input (YYYY-MM-DDTHH:MM)
+    const formattedDateTime = localISOTime.slice(0, 16);
+    // Set the value of the input field
+    timestampInput.value = formattedDateTime;
+});
