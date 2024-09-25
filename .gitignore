@@ -111,5 +111,8 @@ dmypy.json
 *.csv
 field_data.csv
 
+# API keys
+APIs.txt
+
 # End of file
 
