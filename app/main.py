@@ -105,6 +105,12 @@ def submit_data():
     role = session.get('role')
     nickname = session.get('nickname')
     collected_data = request.form.to_dict()  # Convert form data to dictionary
+    reasons = request.form.getlist('reason_of_no[]')
+    collected_data['reason_of_no'] = ' - '.join(reasons)
+    collected_data.pop('reason_of_no[]', None)
+    home_characteristics = request.form.getlist('appliances[]')
+    collected_data['appliances'] = ' - '.join(home_characteristics)
+    collected_data.pop('appliances[]', None)
     save_data(collected_data, role, nickname)  # Save processed data to CSV using pandas
     flash('Data submitted successfully!', 'success')  # Optional: Feedback to user
     return redirect(url_for('data_collection'))  # Redirect back to data collection page

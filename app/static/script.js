@@ -74,8 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Adding the current time and date to the Submission Form of data_collection.html, still allowing to modify it if necessary
+
 document.addEventListener('DOMContentLoaded', function() {
+    
+    // Adding the current time and date to the Submission Form of data_collection.html, still allowing to modify it if necessary
     const timestampInput = document.getElementById('timestamp');
     // Get the current date and time
     const now = new Date();
@@ -86,4 +88,57 @@ document.addEventListener('DOMContentLoaded', function() {
     const formattedDateTime = localISOTime.slice(0, 16);
     // Set the value of the input field
     timestampInput.value = formattedDateTime;
+
+
+    // Functionality to show/hide contact-only fields
+    const prospectResponse = document.getElementById('prospect_response');
+    const contactFields = document.getElementById('contact-fields');
+
+    function toggleContactFields() {
+        if (prospectResponse.value && prospectResponse.value !== 'No answer') {
+            contactFields.style.display = 'block';
+        } else {
+            contactFields.style.display = 'none';
+            // Clear values
+            document.getElementById('electricity_bill_estimate').value = '';
+            document.getElementById('number_of_decision_makers').value = '';
+            document.getElementById('approximate_age').value = '';
+            document.getElementById('number_inhabitants').value = '';
+        }
+    }
+    // Initial check in case the default value is not 'No answer'
+    toggleContactFields();
+    // Add event listener to the prospect response field
+    prospectResponse.addEventListener('change', function() {
+        toggleContactFields();
+    });
+
+    // Functionality to show/hide appointment details
+    const appointmentDetails = document.getElementById('appointment-details');
+    const contactEmail = document.getElementById('contact_email');
+    const contactPhone = document.getElementById('contact_phone');
+    const appointmentTime = document.getElementById('appointment_time');
+    function toggleAppointmentDetails() {
+        if (prospectResponse.value === 'Appointment set') {
+            appointmentDetails.style.display = 'block';
+            // Make fields required
+            contactEmail.required = true;
+            contactPhone.required = true;
+            appointmentTime.required = true;
+        } else {
+            appointmentDetails.style.display = 'none';
+            // Remove required attribute
+            contactEmail.required = false;
+            contactPhone.required = false;
+            appointmentTime.required = false;
+            // Clear the values
+            contactEmail.value = '';
+            contactPhone.value = '';
+            appointmentTime.value = '';
+        }
+    }
+    // Initial check in case the default value is 'Appointment set'
+    toggleAppointmentDetails();
+    // Add event listener to the prospect response field
+    prospectResponse.addEventListener('change', toggleAppointmentDetails);
 });

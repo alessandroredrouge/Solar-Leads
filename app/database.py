@@ -14,10 +14,10 @@ def init_db():
     if not os.path.exists(CSV_FILE_PATH):
         # Define the initial structure of the CSV file
         df = pd.DataFrame(columns=[
-            'Prospect ID', 'address', 'timestamp', 'prospect_response', 'reason_of_no',
-            'electricity_bill_estimate', 'approximate_age', 'presumed_gender',
-            'presumed_family_status', 'solar_panels_on_roof', 'house_characteristics',
-            'interest_level', 'additional_notes', 'Submitted by'
+            'Prospect ID', 'address', 'timestamp', 'prospect_response', 'contact_email', 
+            'contact_phone', 'appointment_time', 'reason_of_no', 'solar_panels_on_roof', 'roof_type_condition',
+            'shading_issues', 'appliances', 'electricity_bill_estimate', 'number_of_decision_makers',
+            'approximate_age', 'number_inhabitants','additional_notes', 'Submitted by'
         ])
         # Save the empty DataFrame to a CSV file
         df.to_csv(CSV_FILE_PATH, index=False)
