@@ -196,6 +196,8 @@
         
         <!-- Add the table to display MongoDB data -->
         <h2>Collected Data</h2>
+        {% set sample_count = data|length %}
+        <p style="text-align: center;">There {{ 'is' if sample_count == 1 else 'are' }} currently <strong>{{ sample_count }}</strong> data sample{{ '' if sample_count == 1 else 's' }} in the database.</p>
         <!-- Delete all button to delete all data from table -->
         <button class="delete-all-btn" id="delete-all-btn">Delete all</button>
         <!-- Define the columns mapping to match the Table headers and the MongoDB keys-->
