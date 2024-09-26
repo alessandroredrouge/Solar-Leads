@@ -5,15 +5,11 @@
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
 from data_processing import process_data
 from google_maps import get_map_data
-from database import init_db, save_data, delete_data, delete_ALL_data
+from database import save_data, delete_data, delete_ALL_data, load_data
 import os
-import csv
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
-
-# Initialize the database from database.py
-init_db()
 
 @app.route('/', methods=['GET', 'POST'])
 def role_selection():
@@ -47,16 +43,9 @@ def data_collection():
     nickname = session.get('nickname')
     if not role or role == 'Manager':
         return redirect(url_for('role_selection')) # only accessible for canvassers and team leaders
-    
-    # Load data from CSV file if it exists
-    data = []
-    file_path = 'field_data.csv'
-    if os.path.exists(file_path):
-        with open(file_path, newline='', encoding='utf-8') as csvfile:
-            reader = csv.reader(csvfile)
-            next(reader)  # Skip the header row because we render it directly in the HTML template
-            data = list(reader)  # Get the data from the CSV file
-
+    data = load_data()
+    for item in data:
+        item['_id'] = str(item['_id'])  # Change the MongoDB ID Object to a string to display it in the HTML
     return render_template('data_collection.html', data=data, role=role, nickname=nickname)
 
 @app.route('/field_support')
@@ -111,11 +100,11 @@ def submit_data():
     home_characteristics = request.form.getlist('appliances[]')
     collected_data['appliances'] = ' - '.join(home_characteristics)
     collected_data.pop('appliances[]', None)
-    save_data(collected_data, role, nickname)  # Save processed data to CSV using pandas
+    save_data(collected_data, role, nickname)  # Save processed data to MongoDB
     flash('Data submitted successfully!', 'success')  # Optional: Feedback to user
     return redirect(url_for('data_collection'))  # Redirect back to data collection page
 
-@app.route('/delete/<int:prospect_id>', methods=['DELETE'])
+@app.route('/delete/<prospect_id>', methods=['DELETE'])
 def delete_prospect(prospect_id):
     """
     Handles the deletion of a row of data from the data stored so far.
@@ -126,7 +115,7 @@ def delete_prospect(prospect_id):
     return jsonify({'success': True}), 200
 
 @app.route('/delete-ALL', methods=['DELETE'])
-def delete_table():
+def delete_all():
     """
     Handles the deletion of a row of data from the data stored so far.
     Processes and deletes the row of data indicated by the user from the database.

@@ -107,12 +107,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# CSV file to avoid leaking personal information
-*.csv
-field_data.csv
-
-# API keys
-APIs.txt
-
 # End of file
 

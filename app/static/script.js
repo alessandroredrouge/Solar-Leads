@@ -18,9 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Functioning of the Delete buttons in the Collected Data table of data_collection.html
+// Delete individual row and all data functionalities from the MongoDB database through the table in data_collection.html
 document.addEventListener('DOMContentLoaded', function() {
-    // Add event listeners to delete buttons
+    // Delete individual row
     document.querySelectorAll('.delete-btn').forEach(function(button) {
         button.addEventListener('click', function() {
             const prospectId = this.getAttribute('data-id');
@@ -45,15 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-});
 
-// Functioning of the Delete ALL button in the Collected Data table of data_collection.html
-document.addEventListener('DOMContentLoaded', function() {
-    // Add event listener to delete all button
+    // Delete all data
     document.querySelectorAll('.delete-all-btn').forEach(function(button) {
         button.addEventListener('click', function() {
-            // Confirm with the user before deleting
-            if (confirm('Are you REEEEEAAAALLY sure you want to delete this record? Cmon man, think about it!')) {
+            // Confirm with the user before deleting all data
+            if (confirm('Are you REALLY sure you want to delete all records? This action cannot be undone!')) {
                 // Send a DELETE request to the server
                 fetch(`/delete-ALL`, {
                     method: 'DELETE',
@@ -63,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Reload the page after deletion
                         window.location.reload();
                     } else {
-                        console.error('Failed to delete prospect.');
+                        console.error('Failed to delete all data.');
                     }
                 })
                 .catch(error => {
@@ -75,11 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+// Add current time and date to the submission form in data_collection.html, and show/hide contact-only / appointment details fields
 document.addEventListener('DOMContentLoaded', function() {
     
     // Adding the current time and date to the Submission Form of data_collection.html, still allowing to modify it if necessary
     const timestampInput = document.getElementById('timestamp');
-    // Get the current date and time
     const now = new Date();
     // Adjust for local timezone offset to get the correct local time
     const timezoneOffset = now.getTimezoneOffset() * 60000; // in milliseconds

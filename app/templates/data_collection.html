@@ -194,53 +194,61 @@
 
         
         
-        <!-- Add the table to display CSV data -->
+        <!-- Add the table to display MongoDB data -->
         <h2>Collected Data</h2>
         <!-- Delete all button to delete all data from table -->
         <button class="delete-all-btn" id="delete-all-btn">Delete all</button>
+        <!-- Define the columns mapping to match the Table headers and the MongoDB keys-->
+        {% set columns = [
+            {'key': '_id', 'name': 'Prospect ID'},
+            {'key': 'address', 'name': 'Address'},
+            {'key': 'timestamp', 'name': 'Time of Contact'},
+            {'key': 'prospect_response', 'name': 'Prospect Response'},
+            {'key': 'contact_email', 'name': 'Contact Email'},
+            {'key': 'contact_phone', 'name': 'Contact Phone Number'},
+            {'key': 'appointment_time', 'name': 'Appointment Time'},
+            {'key': 'reason_of_no', 'name': "Reason of 'No'"},
+            {'key': 'solar_panels_on_roof', 'name': 'Solar Panels on Roof'},
+            {'key': 'roof_type_condition', 'name': 'Roof Type & Condition'},
+            {'key': 'shading_issues', 'name': 'Shading Issues'},
+            {'key': 'appliances', 'name': 'Appliances & House Characteristics'},
+            {'key': 'electricity_bill_estimate', 'name': 'Quarterly Electricity Bill Estimate (in $)'},
+            {'key': 'number_of_decision_makers', 'name': 'Number of Decision Makers'},
+            {'key': 'approximate_age', 'name': 'Approximate Age of Decision Maker(s)'},
+            {'key': 'number_inhabitants', 'name': 'Number of Inhabitants in the House'},
+            {'key': 'additional_notes', 'name': 'Additional Notes / Comments'},
+            {'key': 'Submitted by', 'name': 'Submitted by'}
+        ] %}
         <div class="table-wrapper">
             <table border="1">
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Prospect ID</th>
-                        <th>Address</th>
-                        <th>Time of contact</th>
-                        <th>Prospect Response</th>
-                        <th>Contact Email</th>
-                        <th>Contact Phone Number</th>
-                        <th>Appointment Time</th>
-                        <th>Reason of 'No'</th>
-                        <th>Solar Panels on Roof</th>
-                        <th>Roof Type & Condition</th>
-                        <th>Shading Issues</th>
-                        <th>Appliances & House Characteristics</th>
-                        <th>Quarterly Electricity Bill Estimate (in $)</th>
-                        <th>Number of Decision Makers</th>
-                        <th>Approximate Age od Decision Maker(s)</th>
-                        <th>Number of Inhabitants in the House</th>
-                        <th>Additional Notes / Comments</th>
-                        <th>Submitted by</th>
+                        {% for column in columns %}
+                            <th>{{ column.name }}</th>
+                        {% endfor %}
                     </tr>
                 </thead>
-                <tbody>
+                <tbody> 
                     {% if data %}
                         {% for row in data %}
                             <tr>
                                 <td class="delete-cell-column">
-                                    <button class="delete-btn" data-id="{{ row[0] }}">X</button>
+                                    <button class="delete-btn" data-id="{{ row['_id'] }}">X</button>
                                 </td>
-                                {% for cell in row %}
-                                    <td>{{ cell }}</td>
+                                {% for column in columns %}
+                                    <td>{{ row.get(column.key, '') }}</td>
+
                                 {% endfor %}
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="18">No data available yet.</td>
+                                <td colspan="{{ columns|length + 1 }}">No data available yet.</td>
                             </tr>
                         {% endfor %}
                     {% endif %}
                 </tbody>
+                
             </table>
         </div>
     </div>

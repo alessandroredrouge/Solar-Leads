@@ -1,91 +1,57 @@
-# Purpose: Manages data storage using pandas and storing data in a CSV file. 
-# Interacts with: main.py, data_processing.py, and possibly models.py.
-# Programming Language: Python (pandas library).
+# Purpose: Manages data storage using pandas and storing data on MongoDB. 
+# Interacts with: main.py, data_processing.py.
+# Programming Language: Python
 
-import pandas as pd
 import os
+from pymongo import MongoClient
+from dotenv import load_dotenv
+from bson.objectid import ObjectId
 
-# Define the path for the CSV file
-CSV_FILE_PATH = 'field_data.csv'
+# Load environment variables from .env file
+load_dotenv()
 
-# Function to initialize the data storage (create a new CSV file if it doesn't exist)
-def init_db():
-    # Check if the CSV file exists
-    if not os.path.exists(CSV_FILE_PATH):
-        # Define the initial structure of the CSV file
-        df = pd.DataFrame(columns=[
-            'Prospect ID', 'address', 'timestamp', 'prospect_response', 'contact_email', 
-            'contact_phone', 'appointment_time', 'reason_of_no', 'solar_panels_on_roof', 'roof_type_condition',
-            'shading_issues', 'appliances', 'electricity_bill_estimate', 'number_of_decision_makers',
-            'approximate_age', 'number_inhabitants','additional_notes', 'Submitted by'
-        ])
-        # Save the empty DataFrame to a CSV file
-        df.to_csv(CSV_FILE_PATH, index=False)
-        print(f"Initialized new database at {CSV_FILE_PATH}")
+# Get the MongoDB URI from environment variables
+MONGO_URI = os.getenv('MONGO_URI')
 
-# Function to save new data into the CSV file
+# Create a MongoClient instance
+client = MongoClient(MONGO_URI)
+
+# Select the database and collection
+db = client['solar_d2d_lead_generation_tracker']
+collection = db['prospects'] 
+
 def save_data(data, role, nickname):
-    # Load the existing data from the CSV file
-    df = pd.read_csv(CSV_FILE_PATH)
+    # Assign the 'Submitted by' field
+    data['Submitted by'] = f'{role} {nickname}'
     
-    # Determine the next Prospect ID by finding the max ID and incrementing it
-    if len(df) > 0:
-        next_id = df['Prospect ID'].max() + 1
-    else:
-        next_id = 1
-    # Assign the new Prospect ID to the data
-    new_data=pd.DataFrame([data])
-    new_data.insert(0, 'Prospect ID', next_id)
-    new_data['Submitted by'] = f'{role} {nickname}'
+    # Insert the data into the MongoDB collection
+    result = collection.insert_one(data)
+    
+    print(f"Data saved successfully with ID: {result.inserted_id}")
 
-    # Append the new data as a new row
-    df = pd.concat([df,new_data], ignore_index=True)
-
-    # Sort the DataFrame so that the most recent data (highest Prospect ID) is at the top
-    df = df.sort_values(by='Prospect ID', ascending=False)
-
-    # Save the updated DataFrame back to the CSV file
-    df.to_csv(CSV_FILE_PATH, index=False)
-    print("Data saved successfully.")
-
-# Function to eliminate a specific row of data from the CSV file
+# Function to eliminate a specific row of data from the MongoDB database
 def delete_data(prospect_id):
-    # Load the existing data from the CSV file
-    df = pd.read_csv(CSV_FILE_PATH)
+    try:
+        prospect_id = ObjectId(prospect_id)
+    except Exception as e:
+        print(f"Invalid Prospect ID: {prospect_id}. Error: {e}")
+        return False
 
-    # Find and delete the row with the given Prospect ID
-    df = df[df['Prospect ID'] != prospect_id]
-
-    # Recalculate the Prospect IDs after deletion
-    df = df.sort_values(by='Prospect ID', ascending=True).reset_index(drop=True)
-    df['Prospect ID'] = range(1, len(df) + 1)
-
-    # Sort by the updated Prospect IDs so that the most recent is on top
-    df = df.sort_values(by='Prospect ID', ascending=False)
-
-    # Save the updated DataFrame back to the CSV file
-    df.to_csv(CSV_FILE_PATH, index=False)
-    print("Data deleted successfully.")
-
-# Function to eliminate ALL data from the CSV file
-def delete_ALL_data():
-     # Load the existing data from the CSV file and get the header (first row)
-    df = pd.read_csv(CSV_FILE_PATH)
-    header = df.columns.tolist()
-    
-    # Create an empty DataFrame with only the header
-    empty_df = pd.DataFrame(columns=header)
-    
-    # Save the empty DataFrame back to the CSV file, keeping only the header
-    empty_df.to_csv(CSV_FILE_PATH, index=False)
-    print("All data deleted successfully.")
-
-# Function to load data from the CSV file
-def load_data():
-    # Check if the CSV file exists
-    if os.path.exists(CSV_FILE_PATH):
-        # Load and return the data as a DataFrame
-        return pd.read_csv(CSV_FILE_PATH)
+    result = collection.delete_one({'_id': prospect_id})
+    if result.deleted_count > 0:
+        print(f"Data with Prospect ID {prospect_id} deleted successfully.")
+        return True
     else:
-        print("No data found. Please initialize the database first.")
-        return pd.DataFrame()
+        print(f"No data found with Prospect ID {prospect_id}.")
+        return False
+
+# Function to eliminate ALL data from the MongoDB database
+def delete_ALL_data():
+    result = collection.delete_many({})
+    print(f"All data deleted successfully. Documents deleted: {result.deleted_count}")
+
+# Function to load data from the MongoDB database
+def load_data():
+    # Retrieve all documents from the MongoDB collection
+    data = list(collection.find().sort('_id', -1))
+    return data
