@@ -69,6 +69,11 @@
                 </div>
                 <!-- Additional Fields to Appear When 'Appointment set' is Selected -->
                 <div id="appointment-details" style="display: none;">
+                    <!-- Name and Surnmane -->
+                    <div class="form-group">
+                        <label for="name_surname">Name and Surname *</label>
+                        <input type="text" id="name_surname" name="name_surname">
+                    </div>
                     <!-- Contact Email -->
                     <div class="form-group">
                         <label for="contact_email">Contact Email *</label>
@@ -207,6 +212,7 @@
             {'key': 'address', 'name': 'Address'},
             {'key': 'timestamp', 'name': 'Time of Contact'},
             {'key': 'prospect_response', 'name': 'Prospect Response'},
+            {'key': 'name_surname', 'name': 'Name and Surname'},
             {'key': 'contact_email', 'name': 'Contact Email'},
             {'key': 'contact_phone', 'name': 'Contact Phone Number'},
             {'key': 'appointment_time', 'name': 'Appointment Time'},

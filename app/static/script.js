@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Functionality to show/hide appointment details
     const appointmentDetails = document.getElementById('appointment-details');
+    const namesurname = document.getElementById('name_surname');
     const contactEmail = document.getElementById('contact_email');
     const contactPhone = document.getElementById('contact_phone');
     const appointmentTime = document.getElementById('appointment_time');
@@ -119,16 +120,19 @@ document.addEventListener('DOMContentLoaded', function() {
         if (prospectResponse.value === 'Appointment set') {
             appointmentDetails.style.display = 'block';
             // Make fields required
+            namesurname.required = true;
             contactEmail.required = true;
             contactPhone.required = true;
             appointmentTime.required = true;
         } else {
             appointmentDetails.style.display = 'none';
             // Remove required attribute
+            namesurname.required = false;
             contactEmail.required = false;
             contactPhone.required = false;
             appointmentTime.required = false;
             // Clear the values
+            namesurname.value = '';
             contactEmail.value = '';
             contactPhone.value = '';
             appointmentTime.value = '';

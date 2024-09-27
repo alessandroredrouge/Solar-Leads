@@ -18,7 +18,8 @@ client = MongoClient(MONGO_URI)
 
 # Select the database and collection
 db = client['solar_d2d_lead_generation_tracker']
-collection = db['prospects'] 
+#TODO: remember to change the collection name to 'prospects' when the real data is being collected
+collection = db['fictitious_data'] # 'prospects' is the collection with the real data collected from the field, 'fictitious_data' is the temporarily one with fake data
 
 def save_data(data, role, nickname):
     # Assign the 'Submitted by' field
