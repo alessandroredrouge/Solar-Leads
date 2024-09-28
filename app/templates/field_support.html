@@ -37,6 +37,15 @@
 <body>
     <div class="flex-container">
         <h1>Field Support Page</h1>
+        <label for="date-select">Select Date:</label>
+        <input type="date" id="date-select" value="{{ selected_date }}">
+        
+        <div id="performance-data">
+            <p>Doors knocked: <span id="doors-knocked">{{ performance.doors_knocked }}</span></p>
+            <p>Appointments set: <span id="appointments-set">{{ performance.appointments_set }}</span></p>
+        </div>
+
+        <div id="sync-status"></div>
     </div>
 </body>
 </html>

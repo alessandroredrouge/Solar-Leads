@@ -3,14 +3,16 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
-from data_processing import process_data
+from data_processing import sync_local_cache, get_performance
 from google_maps import get_map_data
 from database import save_data, delete_data, delete_ALL_data, load_data
+from datetime import datetime
 import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
 
+# Route for Role Selection Page
 @app.route('/', methods=['GET', 'POST'])
 def role_selection():
     """
@@ -32,7 +34,7 @@ def role_selection():
         
     return render_template('role_selection.html')
 
-# Routes for Data Collection, Field Support and Analytics Pages
+# Routes for Data Collection, Field Support, Prospect Qualification and Analytics Pages
 @app.route('/data_collection')
 def data_collection():
     """
@@ -58,7 +60,9 @@ def field_support():
     nickname = session.get('nickname')
     if not role or role == 'Manager':
         return redirect(url_for('role_selection')) # only accessible for canvassers and team leaders
-    return render_template('field_support.html', role=role, nickname=nickname)
+    selected_date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+    performance = get_performance(role, nickname, selected_date)
+    return render_template('field_support.html', role=role, nickname=nickname, performance=performance, selected_date=selected_date)
 
 @app.route('/prospect_qualification')
 def prospect_qualification():
@@ -84,7 +88,7 @@ def analytics():
         return redirect(url_for('role_selection'))  # Only accessible for managers
     return render_template('analytics.html', role=role, nickname=nickname)
 
-# Routes for Data handling
+# Routes for Data Handling
 @app.route('/submit_data', methods=['POST'])
 def submit_data():
     """
@@ -124,6 +128,25 @@ def delete_all():
     flash('All data eliminated successfully!', 'success')  # Optional: Feedback to user 
     return jsonify({'success': True}), 200
   
+# Routes for Data Processing
+@app.route('/get_performance', methods=['POST'])
+def get_performance_data():
+    role = session.get('role')
+    nickname = session.get('nickname')
+    if not role or not nickname:
+        return jsonify({"error": "Not authenticated"}), 401
+    selected_date = request.json['date']
+    performance = get_performance(role, nickname, selected_date)
+    return jsonify(performance)
+
+@app.route('/sync_data', methods=['POST'])
+def sync_data():
+    if sync_local_cache():
+        return jsonify({"message": "Data synced successfully"}), 200
+    else:
+        return jsonify({"message": "No new data to sync"}), 204
+
+
 # Routes for Google Maps Data
 @app.route('/get_map')
 def get_map():

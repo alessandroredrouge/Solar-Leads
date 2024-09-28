@@ -143,3 +143,54 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listener to the prospect response field
     prospectResponse.addEventListener('change', toggleAppointmentDetails);
 });
+
+
+// Functionality to sync data and update performance metrics in field_support.html
+document.addEventListener('DOMContentLoaded', function() {
+    const dateSelect = document.getElementById('date-select');
+    const syncStatus = document.getElementById('sync-status');
+
+    function syncData() {
+        syncStatus.textContent = 'Syncing...';
+        fetch('/sync_data', {
+            method: 'POST',
+        })
+        .then(response => response.json())
+        .then(data => {
+            syncStatus.textContent = 'Last sync: ' + new Date().toLocaleTimeString();
+            updatePerformanceData(dateSelect.value);
+        })
+        .catch(error => {
+            syncStatus.textContent = 'Sync failed. Retry in 5 minutes.';
+            console.error('Error syncing data:', error);
+        });
+    }
+
+    function updatePerformanceData(selectedDate) {
+        fetch('/get_performance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({date: selectedDate}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('doors-knocked').textContent = data.doors_knocked;
+            document.getElementById('appointments-set').textContent = data.appointments_set;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    dateSelect.addEventListener('change', function() {
+        updatePerformanceData(this.value);
+    });
+
+    // Sync data every 5 minutes (adjust as needed)
+    setInterval(syncData, 5 * 60 * 1000);
+
+    // Initial sync when page loads
+    syncData();
+});
