@@ -58,7 +58,7 @@ for day in range(num_days):
                     'Soon moving out / selling the house', 'Already agreed with competitor', 'Too much shading', 'Other (explain in Comments)'],
                     1,
                     p=[0.626, 0.123, 0.07, 0.043, 0.041, 0.022, 0.014, 0.008, 0.017, 0.014, 0.002, 0.02]
-                )[0] if prospect_response != 'No answer' else 'n/a',
+                )[0] if prospect_response not in ['No answer', 'Appointment set'] else 'n/a',
                 'solar_panels_on_roof': np.random.choice(
                     ['Yes, new PV (less than 5 years old)', 'Yes, old PV (more than 5 years old)', 'Yes, thermal panels', 'No', 'Unknown'], 1, 
                     p=[0.2, 0.4, 0.05, 0.25, 0.1])[0],
