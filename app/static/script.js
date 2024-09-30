@@ -145,7 +145,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Functionality to sync data and update performance metrics in field_support.html
 document.addEventListener('DOMContentLoaded', function() {
     const dateSelect = document.getElementById('date-select');
     const syncStatus = document.getElementById('sync-status');
@@ -176,14 +175,25 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('doors-knocked').textContent = data.doors_knocked;
-            document.getElementById('appointments-set').textContent = data.appointments_set;
+            document.querySelector('.performance-item:nth-child(1) h2').textContent = data.doors_knocked;
+            document.querySelector('.performance-item:nth-child(2) h2').textContent = data.appointments_set;
+            document.querySelector('.performance-item:nth-child(3) h2').textContent = `${data.rank_doors_knocked}${getRankSuffix(data.rank_doors_knocked)}`;
+            document.querySelector('.performance-item:nth-child(4) h2').textContent = `${data.rank_appointments_set}${getRankSuffix(data.rank_appointments_set)}`;
+            document.querySelector('.performance-item:nth-child(5) h2').textContent = data.doors_away;
+            document.querySelector('.performance-item:nth-child(6) h2').textContent = data.conv_rate;
         })
         .catch(error => {
             console.error('Error:', error);
         });
     }
 
+    function getRankSuffix(rank) {
+        if (rank % 10 === 1 && rank % 100 !== 11) return 'st';
+        if (rank % 10 === 2 && rank % 100 !== 12) return 'nd';
+        if (rank % 10 === 3 && rank % 100 !== 13) return 'rd';
+        return 'th';
+    }
+    
     dateSelect.addEventListener('change', function() {
         updatePerformanceData(this.value);
     });

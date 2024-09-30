@@ -37,13 +37,40 @@
 <body>
     <div class="flex-container">
         <h1>Field Support Page</h1>
-        <label for="date-select">Select Date:</label>
-        <input type="date" id="date-select" value="{{ selected_date }}">
-        
-        <div id="performance-data">
-            <p>Doors knocked: <span id="doors-knocked">{{ performance.doors_knocked }}</span></p>
-            <p>Appointments set: <span id="appointments-set">{{ performance.appointments_set }}</span></p>
+        <h2>Today's performance</h2>
+        <div class="date-selector">
+            <label for="date-select">Select Date:</label>
+            <input type="date" id="date-select" value="{{ selected_date }}">
         </div>
+        
+        <p class="data-tip"><strong>Tip:</strong> The data of the fake dataset go from the 28th of August 2024 to the 28th of September 2024, weekends included.</p>
+    
+    <div class="performance-grid">
+        <div class="performance-item">
+            <h2>{{ performance.doors_knocked }}</h2>
+            <p>Doors knocked today</p>
+        </div>
+        <div class="performance-item">
+            <h2>{{ performance.appointments_set }}</h2>
+            <p>Appointment{{ 's' if performance.appointments_set != 1 else '' }} set today</p>  <!--  FIXME: the adding or removing of the 's' doesn't work-->
+        </div>
+        <div class="performance-item">
+            <h2>{{ performance.rank_doors_knocked }}</h2>
+            <p>in Doors knocked today within your team</p>
+        </div>
+        <div class="performance-item">
+            <h2>{{ performance.rank_appointments_set }}</h2>
+            <p>in Appointments set today within your team</p>
+        </div>
+        <div class="performance-item">
+            <h2>{{ performance.doors_away }}</h2>
+            <p>Doors away from your daily goal</p>
+        </div>
+        <div class="performance-item">
+            <h2>{{ performance.conv_rate}}</h2>
+            <p>your Conversion Rate today</p>
+        </div>
+    </div>
 
         <div id="sync-status"></div>
     </div>

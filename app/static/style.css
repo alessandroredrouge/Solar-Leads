@@ -217,6 +217,7 @@ tbody tr:hover {
     .flex-container {
         width: 95%;
         padding: 1.5rem;
+        overflow: hidden;
     }
 
     h1 {
@@ -256,4 +257,94 @@ tbody tr:hover {
 
 .role-option button {
     width: 120px;
+}
+
+/* Field Support Page Styles */
+.date-selector {
+    text-align: center;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.date-selector label {
+    font-weight: 600;
+    color: #4a4a4a;
+    margin-right: 10px;
+}
+
+.date-selector input[type="date"] {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.date-selector input[type="date"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.data-tip {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #4a4a4a;
+}
+
+.performance-grid {
+    display: grid;
+    justify-content: space-between;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.performance-item {
+    flex: 1;
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 0 0.5rem;
+}
+
+.performance-item h2 {
+    font-size: 2rem;
+    color: #667eea;
+    margin-bottom: 0.5rem;
+}
+
+.performance-item p {
+    font-size: 0.9rem;
+    color: #4a4a4a;
+}
+
+#sync-status {
+    text-align: center;
+    margin-top: 1rem;
+    font-style: italic;
+    color: #4a4a4a;
+}
+
+/* Responsive design for Field Support Page */
+@media (max-width: 1200px) {
+    .performance-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .performance-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .performance-grid {
+        grid-template-columns: 1fr;
+    }
 }

@@ -49,21 +49,47 @@ def get_performance(role, nickname, selected_date):
     if isinstance(selected_date, str):
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
     
-    pipeline = [
-        {"$match": {
-            "Submitted by": f"{role} {nickname}",
-            "timestamp": {
-                "$gte": datetime.combine(selected_date, datetime.min.time()),
-                "$lt": datetime.combine(selected_date + timedelta(days=1), datetime.min.time())
-            }
-        }},
-        {"$group": {
-            "_id": None,
-            "doors_knocked": {"$sum": 1},
-            "appointments_set": {"$sum": {"$cond": [{"$eq": ["$prospect_response", "Appointment set"]}, 1, 0]}}
-        }}
-    ]
-    result = list(collection.aggregate(pipeline))
-    return result[0] if result else {"doors_knocked": 0, "appointments_set": 0}
+    start_of_day = datetime.combine(selected_date, datetime.min.time())
+    end_of_day = start_of_day + timedelta(days=1)
+
+    # Get all submissions for the selected date
+    all_submissions = list(collection.find({
+        "timestamp": {"$gte": start_of_day, "$lt": end_of_day}
+    }))
+
+    # Create dictionaries of users and their performance
+    user_appointments = {}
+    user_doors_knocked = {}
+    for submission in all_submissions:
+        user = submission['Submitted by']
+        if user not in user_appointments:
+            user_appointments[user] = 0
+            user_doors_knocked[user] = 0
+        user_doors_knocked[user] += 1
+        if submission['prospect_response'] == "Appointment set":
+            user_appointments[user] += 1
+
+    # Get the current user's performance
+    current_user = f"{role} {nickname}"
+    doors_knocked = user_doors_knocked.get(current_user, 0)
+    appointments_set = user_appointments.get(current_user, 0)
+
+    # Calculate ranks
+    sorted_doors = sorted(user_doors_knocked.items(), key=lambda x: x[1], reverse=True)
+    sorted_appointments = sorted(user_appointments.items(), key=lambda x: x[1], reverse=True)
+    rank_doors_knocked = next((i for i, (user, _) in enumerate(sorted_doors) if user == current_user), len(sorted_doors)) + 1
+    rank_appointments_set = next((i for i, (user, _) in enumerate(sorted_appointments) if user == current_user), len(sorted_appointments)) + 1
+
+    # Calculate doors away from daily goal
+    daily_goal = 100  # Adjust as needed
+    doors_away = max(0, daily_goal - doors_knocked)
+                     
+    # Calculate conversion rate
+    conv_rate = f"{(appointments_set / doors_knocked * 100):.2f}%" if doors_knocked > 0 else "0.00%"
+
+    performance = {"doors_knocked": doors_knocked, "appointments_set": appointments_set, "rank_doors_knocked": rank_doors_knocked,
+        "rank_appointments_set": rank_appointments_set, "doors_away": doors_away, "conv_rate": conv_rate}
+
+    return performance
 
 # Add more functions for complex calculations using local_df as needed
