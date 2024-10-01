@@ -3,7 +3,7 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
-from data_processing import sync_local_cache, get_performance
+from data_processing import sync_local_cache, get_performance, get_overall_performance
 from google_maps import get_map_data
 from database import save_data, delete_data, delete_ALL_data, load_data
 from datetime import datetime
@@ -139,12 +139,24 @@ def get_performance_data():
     performance = get_performance(role, nickname, selected_date)
     return jsonify(performance)
 
+@app.route('/get_overall_performance', methods=['GET'])
+def get_overall_performance_data():
+    role = session.get('role')
+    nickname = session.get('nickname')
+    if not role or not nickname:
+        return jsonify({"error": "Not authenticated"}), 401
+    overall_performance = get_overall_performance(role, nickname)
+    return jsonify(overall_performance)
+
 @app.route('/sync_data', methods=['POST'])
 def sync_data():
-    if sync_local_cache():
-        return jsonify({"message": "Data synced successfully"}), 200
-    else:
-        return jsonify({"message": "No new data to sync"}), 204
+    try:
+        if sync_local_cache():
+            return jsonify({"message": "Data synced successfully"}), 200
+        else:
+            return jsonify({"message": "No new data to sync"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # Routes for Google Maps Data

@@ -92,4 +92,39 @@ def get_performance(role, nickname, selected_date):
 
     return performance
 
+def get_overall_performance(role, nickname):
+    current_user = f"{role} {nickname}"
+    
+    # Get all submissions for the current user
+    all_submissions = list(collection.find({"Submitted by": current_user}))
+    
+    # Calculate metrics
+    doors_knocked = len(all_submissions)
+    appointments_set = sum(1 for submission in all_submissions if submission['prospect_response'] == "Appointment set")
+    conv_rate = f"{(appointments_set / doors_knocked * 100):.2f}%" if doors_knocked > 0 else "0.00%"
+    
+    # Calculate days since started
+    if all_submissions:
+        # Convert string timestamps to datetime objects if necessary
+        timestamps = []
+        for submission in all_submissions:
+            timestamp = submission['timestamp']
+            if isinstance(timestamp, str):
+                timestamp = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+            timestamps.append(timestamp)
+        
+        first_submission = min(timestamps)
+        days_since_started = (datetime.now(first_submission.tzinfo) - first_submission).days + 1
+    else:
+        days_since_started = 0
+
+    overall_performance = {
+        "total_doors_knocked": doors_knocked,
+        "total_appointments_set": appointments_set,
+        "average_conv_rate": conv_rate,
+        "days_since_started": days_since_started
+    }
+
+    return overall_performance
+
 # Add more functions for complex calculations using local_df as needed

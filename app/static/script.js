@@ -162,14 +162,43 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/sync_data', {
             method: 'POST',
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            syncStatus.textContent = 'Last sync: ' + new Date().toLocaleTimeString();
-            updatePerformanceData(dateSelect.value);
+            if (data.message === "No new data to sync") {
+                syncStatus.textContent = 'No new data to sync. Last check: ' + new Date().toLocaleTimeString();
+            } else {
+                syncStatus.textContent = 'Last successful sync: ' + new Date().toLocaleTimeString();
+                updatePerformanceData(dateSelect.value);
+                updateOverallPerformanceData();
+            }
         })
         .catch(error => {
-            syncStatus.textContent = 'Sync failed. Retry in 5 minutes.';
+            syncStatus.textContent = 'Sync failed. Will retry in 5 minutes. Error: ' + error.message;
             console.error('Error syncing data:', error);
+        });
+    }
+
+    function updateOverallPerformanceData() {
+        fetch('/get_overall_performance', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('total-doors-knocked').textContent = data.total_doors_knocked;
+            document.getElementById('total-appointments-set').textContent = data.total_appointments_set;
+            document.getElementById('average-conv-rate').textContent = data.average_conv_rate;
+            document.getElementById('days-since-started').textContent = data.days_since_started;
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
     }
 
@@ -205,6 +234,8 @@ document.addEventListener('DOMContentLoaded', function() {
     dateSelect.addEventListener('change', function() {
         updatePerformanceData(this.value);
     });
+
+    updateOverallPerformanceData();
 
     // Sync data every 5 minutes (adjust as needed)
     setInterval(syncData, 5 * 60 * 1000);
