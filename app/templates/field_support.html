@@ -46,32 +46,47 @@
         <p class="data-tip"><strong>Tip:</strong> The data of the fake dataset go from the 28th of August 2024 to the 28th of September 2024, weekends included.
             Select a date in this range to visualize the related data.</p>
     
-    <div class="performance-grid">
-        <div class="performance-item">
-            <h2>{{ performance.doors_knocked }}</h2>
-            <p>Doors knocked today</p>
+        <div class="performance-grid">
+            <div class="performance-item">
+                <h2>{{ performance.doors_knocked }}</h2>
+                <p>Doors knocked today</p>
+            </div>
+            <div class="performance-item">
+                <h2>{{ performance.appointments_set }}</h2>
+                <p>Appointment{{ 's' if performance.appointments_set != 1 else '' }} set today</p>  <!--  FIXME: the adding or removing of the 's' doesn't work-->
+            </div>
+            <div class="performance-item">
+                <h2>{{ performance.rank_doors_knocked }}</h2>
+                <p>in Doors knocked today within your team</p>
+            </div>
+            <div class="performance-item">
+                <h2>{{ performance.rank_appointments_set }}</h2>
+                <p>in Appointments set today within your team</p>
+            </div>
+            <div class="performance-item">
+                <h2>{{ performance.doors_away }}</h2>
+                <p>Doors away from your daily goal</p>
+            </div>
+            <div class="performance-item">
+                <h2>{{ performance.conv_rate}}</h2>
+                <p>your Conversion Rate today</p>
+            </div>
         </div>
-        <div class="performance-item">
-            <h2>{{ performance.appointments_set }}</h2>
-            <p>Appointment{{ 's' if performance.appointments_set != 1 else '' }} set today</p>  <!--  FIXME: the adding or removing of the 's' doesn't work-->
+
+        <h2>Prospect's map</h2> <!-- TODO: complete this part -->
+
+        <h2>Suggested route</h2> <!-- TODO: complete this part -->
+
+        <h2>Pitch recap</h2> <!-- TODO: complete this part -->
+        <div id="pitch-recap">
+            <textarea id="pitch-box" readonly></textarea>
+            <div class="pitch-buttons">
+                <button id="edit-btn">Edit</button>
+                <button id="save-btn" style="display: none;">Save</button>
+            </div>
         </div>
-        <div class="performance-item">
-            <h2>{{ performance.rank_doors_knocked }}</h2>
-            <p>in Doors knocked today within your team</p>
-        </div>
-        <div class="performance-item">
-            <h2>{{ performance.rank_appointments_set }}</h2>
-            <p>in Appointments set today within your team</p>
-        </div>
-        <div class="performance-item">
-            <h2>{{ performance.doors_away }}</h2>
-            <p>Doors away from your daily goal</p>
-        </div>
-        <div class="performance-item">
-            <h2>{{ performance.conv_rate}}</h2>
-            <p>your Conversion Rate today</p>
-        </div>
-    </div>
+
+        <h2>Overall performance</h2> <!-- TODO: complete this part -->
 
         <div id="sync-status"></div>
     </div>

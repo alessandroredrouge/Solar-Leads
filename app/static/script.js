@@ -156,6 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const dateSelect = document.getElementById('date-select');
     const syncStatus = document.getElementById('sync-status');
 
+    // FIXME: make this sync work properly
     function syncData() {
         syncStatus.textContent = 'Syncing...';
         fetch('/sync_data', {
@@ -210,4 +211,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initial sync when page loads
     syncData();
+});
+
+// Pitch recap functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const pitchBox = document.getElementById('pitch-box');
+    const editBtn = document.getElementById('edit-btn');
+    const saveBtn = document.getElementById('save-btn');
+
+    if (pitchBox && editBtn && saveBtn) {
+        // Set initial pitch text
+        pitchBox.value = "Hello, how are you today?\n\
+I'm here to see if you qualify for the government grant to go solar.\n\
+Have you heard about this grant?\n\
+\n\
+Let me explain: We install solar panels with no upfront cost and no installation fee. The system will reduce your power bill to zero, and instead of paying for electricity, you'll pay towards the system until it's paid off. If you can afford your current power bill, you can definitely afford this system.\n\
+\n\
+To qualify, you need to pay $xxx or more on energy bills each quarter and be the homeowner.\n\
+\n\
+We're offering a free consultation with a specialist who will visit your home for a 30-minute chat. They'll assess your roof space and answer any questions you have. If you're not interested after the consultation, you can simply ask them to leave.\n\
+\n\
+Would this be something you're interested in?";
+
+        editBtn.addEventListener('click', () => {
+            pitchBox.readOnly = false;
+            pitchBox.focus();
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'inline-block';
+        });
+
+        saveBtn.addEventListener('click', () => {
+            pitchBox.readOnly = true;
+            editBtn.style.display = 'inline-block';
+            saveBtn.style.display = 'none';
+            // Here you would typically save the new pitch text to a database
+            console.log('New pitch saved:', pitchBox.value);
+        });
+    }
 });

@@ -348,3 +348,31 @@ tbody tr:hover {
         grid-template-columns: 1fr;
     }
 }
+
+/* Pitch recap styles */
+#pitch-box {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+.pitch-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#edit-btn, #save-btn {
+    width: auto;
+    display: inline-block;
+}
+
+#save-btn {
+    background-color: #28a745;
+}
+
+#save-btn:hover {
+    background-color: #218838;
+}
