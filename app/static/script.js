@@ -124,6 +124,13 @@ document.addEventListener('DOMContentLoaded', function() {
             contactEmail.required = true;
             contactPhone.required = true;
             appointmentTime.required = true;
+        } else if (prospectResponse.value === 'Request to Return later') {
+            appointmentDetails.style.display = 'block';
+            // Make fields optional
+            namesurname.required = false;
+            contactEmail.required = false;
+            contactPhone.required = false;
+            appointmentTime.required = false;
         } else {
             appointmentDetails.style.display = 'none';
             // Remove required attribute
