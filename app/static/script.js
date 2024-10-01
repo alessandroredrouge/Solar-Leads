@@ -280,3 +280,33 @@ Would this be something you're interested in?";
         });
     }
 });
+
+
+// Call this function when the analytics page loads
+document.addEventListener('DOMContentLoaded', function() {
+    function updateTeamOverviewData() {
+        fetch('/get_team_overview', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('team-members').textContent = data.team_members;
+            document.getElementById('total-doors').textContent = data.total_doors;
+            document.getElementById('total-appointments').textContent = data.total_appointments;
+            document.getElementById('avg-doors-per-day').textContent = data.avg_doors_per_day_employee;
+            document.getElementById('avg-appointments-per-day').textContent = data.avg_appointments_per_day_employee;
+            document.getElementById('avg-conversion-rate').textContent = data.avg_conversion_rate;
+            document.getElementById('days-of-collection').textContent = data.days_of_collection;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    if (document.querySelector('.team-overview')) {
+        updateTeamOverviewData();
+    }
+});

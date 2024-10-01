@@ -3,7 +3,7 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
-from data_processing import sync_local_cache, get_performance, get_overall_performance
+from data_processing import sync_local_cache, get_performance, get_overall_performance, get_team_overview
 from google_maps import get_map_data
 from database import save_data, delete_data, delete_ALL_data, load_data
 from datetime import datetime
@@ -147,6 +147,13 @@ def get_overall_performance_data():
         return jsonify({"error": "Not authenticated"}), 401
     overall_performance = get_overall_performance(role, nickname)
     return jsonify(overall_performance)
+
+@app.route('/get_team_overview', methods=['GET'])
+def get_team_overview_data():
+    if session.get('role') != 'Manager':
+        return jsonify({"error": "Unauthorized"}), 403
+    team_overview = get_team_overview()
+    return jsonify(team_overview)
 
 @app.route('/sync_data', methods=['POST'])
 def sync_data():

@@ -26,6 +26,7 @@ collection = db['fictitious_data'] # 'prospects' is the collection with the real
 local_df = None
 last_sync_time = None
 
+#General fuctions
 def sync_local_cache():
     global local_df, last_sync_time
     if last_sync_time:
@@ -44,6 +45,8 @@ def sync_local_cache():
     
     last_sync_time = datetime.now()
     return True  # New data was synced
+
+# Functions for the Field Support webpage
 
 def get_performance(role, nickname, selected_date):
     if isinstance(selected_date, str):
@@ -126,5 +129,48 @@ def get_overall_performance(role, nickname):
     }
 
     return overall_performance
+
+# Functions for the Analytics webpage
+
+def get_team_overview():
+    # Get all submissions
+    all_submissions = list(collection.find())
+
+    # Calculate metrics
+    team_members = len(set(sub['Submitted by'] for sub in all_submissions))
+    total_doors = len(all_submissions)
+    total_appointments = sum(1 for sub in all_submissions if sub['prospect_response'] == "Appointment set")
+
+    # Calculate date range
+    if all_submissions:
+        # Convert string timestamps to datetime objects if necessary
+        timestamps = []
+        for submission in all_submissions:
+            timestamp = submission['timestamp']
+            if isinstance(timestamp, str):
+                timestamp = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+            timestamps.append(timestamp)
+        
+        first_submission = min(timestamps)
+        days_since_started = (datetime.now(first_submission.tzinfo) - first_submission).days + 1
+    else:
+        days_since_started = 0
+
+    # Calculate averages
+    avg_doors_per_day_employee = total_doors / (days_since_started * team_members) if days_since_started and team_members else 0
+    avg_appointments_per_day_employee = total_appointments / (days_since_started * team_members) if days_since_started and team_members else 0
+    avg_conversion_rate = (total_appointments / total_doors * 100) if total_doors else 0
+
+    team_overview = {
+        "team_members": team_members,
+        "total_doors": total_doors,
+        "total_appointments": total_appointments,
+        "avg_doors_per_day_employee": round(avg_doors_per_day_employee, 2),
+        "avg_appointments_per_day_employee": round(avg_appointments_per_day_employee, 2),
+        "avg_conversion_rate": f"{avg_conversion_rate:.2f}%",
+        "days_of_collection": days_since_started
+    }
+
+    return team_overview
 
 # Add more functions for complex calculations using local_df as needed
