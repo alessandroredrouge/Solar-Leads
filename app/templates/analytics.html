@@ -8,6 +8,7 @@
     <title>Analytics</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <!-- Navbar -->
 <nav id="navbar">
@@ -70,12 +71,23 @@
         </div>
 
         <h2>Team's Performances</h2>
+        <div class="chart-container">
+            <div class="chart-controls">
+                <select id="metric-select">
+                    <option value="appointments">Appointments Set</option>
+                    <option value="doors">Doors Knocked</option>
+                    <option value="conversion">Conversion Rate</option>
+                </select>
+                <button id="toggle-view">Total / Daily</button>
+            </div>
+            <canvas id="teamPerformanceChart"></canvas>
+        </div>
+        
+        <h2>Types of engagement with the Prospects</h2> <!--TODO: complete this part  -->
 
-        <h2>Types of engagement with the Prospects</h2>
+        <h2>Reasons of No</h2> <!--TODO: complete this part  -->
 
-        <h2>Reasons of No</h2>
-
-        <h2>Insights</h2>
+        <h2>Insights</h2> <!--TODO: complete this part  -->
 
     </div>
 </body>

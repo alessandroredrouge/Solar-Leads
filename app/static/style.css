@@ -376,3 +376,21 @@ tbody tr:hover {
 #save-btn:hover {
     background-color: #218838;
 }
+
+/* Team performance chart styling in Analytics page */
+.chart-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.chart-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#metric-select, #toggle-view {
+    padding: 5px 10px;
+    font-size: 14px;
+}

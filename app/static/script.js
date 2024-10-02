@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePerformanceData(selectedDate) {
-        fetch('/get_performance', {
+        fetch('/get_one_day_performance', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -308,5 +308,75 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (document.querySelector('.team-overview')) {
         updateTeamOverviewData();
+    }
+});
+
+// Team performance chart functionality in Analytics page
+let teamPerformanceChart;
+let teamPerformanceData;
+
+function fetchTeamPerformanceData() {
+    return fetch('/get_team_performance')
+        .then(response => response.json())
+        .then(data => {
+            teamPerformanceData = data;
+            return data;
+        });
+}
+
+function createTeamPerformanceChart(data, metric = 'appointments', view = 'total') {
+    const ctx = document.getElementById('teamPerformanceChart').getContext('2d');
+    const labels = data.map(d => d.member);
+    const values = data.map(d => d[metric][view]);
+
+    if (teamPerformanceChart) {
+        teamPerformanceChart.destroy();
+    }
+
+    teamPerformanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: `${metric.charAt(0).toUpperCase() + metric.slice(1)} (${view})`,
+                data: values,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: metric === 'conversion' ? 'Percentage' : 'Count'
+                    }
+                }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const metricSelect = document.getElementById('metric-select');
+    const toggleViewBtn = document.getElementById('toggle-view');
+    let currentView = 'total';
+
+    if (metricSelect && toggleViewBtn) {
+        fetchTeamPerformanceData().then(data => {
+            createTeamPerformanceChart(data);
+
+            metricSelect.addEventListener('change', function() {
+                createTeamPerformanceChart(teamPerformanceData, this.value, currentView);
+            });
+
+            toggleViewBtn.addEventListener('click', function() {
+                currentView = currentView === 'total' ? 'daily' : 'total';
+                createTeamPerformanceChart(teamPerformanceData, metricSelect.value, currentView);
+            });
+        });
     }
 });

@@ -7,6 +7,8 @@ import pandas as pd
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from collections import defaultdict
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -48,7 +50,7 @@ def sync_local_cache():
 
 # Functions for the Field Support webpage
 
-def get_performance(role, nickname, selected_date):
+def get_one_day_performance(role, nickname, selected_date):
     if isinstance(selected_date, str):
         selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
     
@@ -130,6 +132,7 @@ def get_overall_performance(role, nickname):
 
     return overall_performance
 
+
 # Functions for the Analytics webpage
 
 def get_team_overview():
@@ -152,7 +155,8 @@ def get_team_overview():
             timestamps.append(timestamp)
         
         first_submission = min(timestamps)
-        days_since_started = (datetime.now(first_submission.tzinfo) - first_submission).days + 1
+        last_submission = max(timestamps)
+        days_since_started = (last_submission - first_submission).days + 1
     else:
         days_since_started = 0
 
@@ -172,5 +176,72 @@ def get_team_overview():
     }
 
     return team_overview
+
+# FIXME: average data from team_overview are slightly different from these ones, find out why
+# If you noticed this, and you went to the source code to find out why, chapeau to you, you found my secret easter egg that I was too lazy to correct hahah
+def get_team_performance():
+    all_submissions = list(collection.find())
+    team_performance = defaultdict(lambda: {"appointments": 0, "doors": 0, "days": set()})
+    timestamps = []
+
+    for submission in all_submissions:
+        member = submission['Submitted by']
+        team_performance[member]["doors"] += 1
+        if submission['prospect_response'] == "Appointment set":
+            team_performance[member]["appointments"] += 1
+        
+        timestamp = submission['timestamp']
+        if isinstance(timestamp, str):
+            timestamp = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+        timestamps.append(timestamp)
+        team_performance[member]["days"].add(timestamp.date())
+
+    if timestamps:
+        first_submission = min(timestamps)
+        last_submission = max(timestamps)
+        days_since_started = (last_submission - first_submission).days + 1
+    else:
+        days_since_started = 0
+
+    result = []
+    for member, data in team_performance.items():
+        active_days = len(data["days"])
+        result.append({
+            "member": member,
+            "appointments": {
+                "total": data["appointments"],
+                "daily": round(data["appointments"] / active_days, 2) if active_days else 0
+            },
+            "doors": {
+                "total": data["doors"],
+                "daily": round(data["doors"] / active_days, 2) if active_days else 0
+            },
+            "conversion": {
+                "total": round(data["appointments"] / data["doors"] * 100, 2) if data["doors"] else 0,
+                "daily": round(data["appointments"] / data["doors"] * 100, 2) if data["doors"] else 0
+            }
+        })
+
+    # Calculate team average
+    if result:
+        team_avg = {
+            "member": "Team Average",
+            "appointments": {
+                "total": round(sum(m["appointments"]["total"] for m in result) / len(result), 2),
+                "daily": round(sum(m["appointments"]["daily"] for m in result) / len(result), 2)
+            },
+            "doors": {
+                "total": round(sum(m["doors"]["total"] for m in result) / len(result), 2),
+                "daily": round(sum(m["doors"]["daily"] for m in result) / len(result), 2)
+            },
+            "conversion": {
+                "total": round(sum(m["conversion"]["total"] for m in result) / len(result), 2),
+                "daily": round(sum(m["conversion"]["daily"] for m in result) / len(result), 2)
+            },
+            "days_since_started": days_since_started
+        }
+        result.append(team_avg)
+
+    return result
 
 # Add more functions for complex calculations using local_df as needed

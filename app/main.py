@@ -3,7 +3,7 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
-from data_processing import sync_local_cache, get_performance, get_overall_performance, get_team_overview
+from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance
 from google_maps import get_map_data
 from database import save_data, delete_data, delete_ALL_data, load_data
 from datetime import datetime
@@ -61,7 +61,7 @@ def field_support():
     if not role or role == 'Manager':
         return redirect(url_for('role_selection')) # only accessible for canvassers and team leaders
     selected_date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
-    performance = get_performance(role, nickname, selected_date)
+    performance = get_one_day_performance(role, nickname, selected_date)
     return render_template('field_support.html', role=role, nickname=nickname, performance=performance, selected_date=selected_date)
 
 @app.route('/prospect_qualification')
@@ -129,14 +129,14 @@ def delete_all():
     return jsonify({'success': True}), 200
   
 # Routes for Data Processing
-@app.route('/get_performance', methods=['POST'])
-def get_performance_data():
+@app.route('/get_one_day_performance', methods=['POST'])
+def get_one_day_performance_data():
     role = session.get('role')
     nickname = session.get('nickname')
     if not role or not nickname:
         return jsonify({"error": "Not authenticated"}), 401
     selected_date = request.json['date']
-    performance = get_performance(role, nickname, selected_date)
+    performance = get_one_day_performance(role, nickname, selected_date)
     return jsonify(performance)
 
 @app.route('/get_overall_performance', methods=['GET'])
@@ -154,6 +154,13 @@ def get_team_overview_data():
         return jsonify({"error": "Unauthorized"}), 403
     team_overview = get_team_overview()
     return jsonify(team_overview)
+
+@app.route('/get_team_performance', methods=['GET'])
+def get_team_performance_data():
+    if session.get('role') != 'Manager':
+        return jsonify({"error": "Unauthorized"}), 403
+    team_performance = get_team_performance()
+    return jsonify(team_performance)
 
 @app.route('/sync_data', methods=['POST'])
 def sync_data():
