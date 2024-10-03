@@ -255,4 +255,28 @@ def get_prospect_responses():
     
     return response_percentages
 
+def get_reasons_of_no():
+    all_submissions = list(collection.find({"prospect_response": {"$ne": "Appointment set"}}))
+    reason_counts = defaultdict(int)
+    for submission in all_submissions:
+        reasons = submission['reason_of_no']
+        if ' - ' in reasons:
+            # Split if there are multiple reasons
+            reasons = reasons.split(' - ')
+        else:
+            # Treat as a single reason
+            reasons = [reasons]
+        for reason in reasons:
+            reason = reason.strip()  # Remove any leading/trailing whitespace
+            if reason:  # Only count non-empty reasons
+                reason_counts[reason] += 1
+    
+    total_reasons = sum(reason_counts.values())
+    if total_reasons > 0:
+        reason_percentages = {k: round(v / total_reasons * 100, 2) for k, v in reason_counts.items()}
+    else:
+        reason_percentages = {}
+    
+    return reason_percentages
+
 # Add more functions for complex calculations using local_df as needed

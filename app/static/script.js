@@ -413,21 +413,74 @@ function createProspectResponsesChart(data) {
                     'rgba(255, 206, 86, 0.8)',
                     'rgba(75, 192, 192, 0.8)',
                     'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(201, 203, 207, 0.8)',
+                    'rgba(50, 100, 192, 0.8)'
                 ],
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
         }
     });
 }
 
+// Reasons of No chart in Analytics page
+let reasonsOfNoChart;
+let reasonsOfNoData;
+
+function fetchReasonsOfNoData() {
+    return fetch('/get_reasons_of_no')
+        .then(response => response.json())
+        .then(data => {
+            reasonsOfNoData = data;
+            return data;
+        });
+}
+
+function createReasonsOfNoChart(data) {
+    const ctx = document.getElementById('reasonsOfNoChart').getContext('2d');
+
+    if (reasonsOfNoChart) {
+        reasonsOfNoChart.destroy();
+    }
+
+    reasonsOfNoChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(201, 203, 207, 0.8)',
+                    'rgba(50, 100, 192, 0.8)'
+                ],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+}
+
+// Load the pie charts in Analytics page
 document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('prospectResponsesChart')) {
         fetchProspectResponsesData().then(data => {
             createProspectResponsesChart(data);
         }).catch(error => console.error('Error fetching prospect responses data:', error));
     }
+    if (document.getElementById('reasonsOfNoChart')) {
+        fetchReasonsOfNoData().then(data => {
+            createReasonsOfNoChart(data);
+        }).catch(error => console.error('Error fetching reasons of no data:', error));
+    }
 });
-
-// Reasons of No chart in Analytics page
