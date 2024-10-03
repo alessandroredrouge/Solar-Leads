@@ -244,4 +244,15 @@ def get_team_performance():
 
     return result
 
+def get_prospect_responses():
+    all_submissions = list(collection.find())
+    response_counts = defaultdict(int)
+    for submission in all_submissions:
+        response_counts[submission['prospect_response']] += 1
+    
+    total_responses = sum(response_counts.values())
+    response_percentages = {k: round(v / total_responses * 100, 2) for k, v in response_counts.items()}
+    
+    return response_percentages
+
 # Add more functions for complex calculations using local_df as needed

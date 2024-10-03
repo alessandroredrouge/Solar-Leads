@@ -3,7 +3,7 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
-from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance
+from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses
 from google_maps import get_map_data
 from database import save_data, delete_data, delete_ALL_data, load_data
 from datetime import datetime
@@ -161,6 +161,13 @@ def get_team_performance_data():
         return jsonify({"error": "Unauthorized"}), 403
     team_performance = get_team_performance()
     return jsonify(team_performance)
+
+@app.route('/get_prospect_responses', methods=['GET'])
+def get_prospect_responses_data():
+    if session.get('role') != 'Manager':
+        return jsonify({"error": "Unauthorized"}), 403
+    data = get_prospect_responses()
+    return jsonify(data)
 
 @app.route('/sync_data', methods=['POST'])
 def sync_data():

@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Team performance chart functionality in Analytics page
+// Team' Performance chart in Analytics page
 let teamPerformanceChart;
 let teamPerformanceData;
 
@@ -380,3 +380,54 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Prospects' Response chart in Analytics page
+let prospectResponsesChart;
+let prospectResponsesData;
+
+function fetchProspectResponsesData() {
+    return fetch('/get_prospect_responses')
+        .then(response => response.json())
+        .then(data => {
+            prospectResponsesData = data;
+            return data;
+        });
+}
+
+function createProspectResponsesChart(data) {
+    const ctx = document.getElementById('prospectResponsesChart').getContext('2d');
+
+    if (prospectResponsesChart) {
+        prospectResponsesChart.destroy();
+    }
+
+    prospectResponsesChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                ],
+            }]
+        },
+        options: {
+            responsive: true,
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('prospectResponsesChart')) {
+        fetchProspectResponsesData().then(data => {
+            createProspectResponsesChart(data);
+        }).catch(error => console.error('Error fetching prospect responses data:', error));
+    }
+});
+
+// Reasons of No chart in Analytics page
