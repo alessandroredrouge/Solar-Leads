@@ -1,0 +1,25 @@
+<!-- Purpose: This is the initial page that appears when the application starts -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Leads</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+</head>
+<body>
+    <div class="flex-container">
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='images/Solar Leads Logo.svg') }}" alt="Solar Leads Logo" class="logo">
+        </div>
+        <h2>a project developed by <a href="https://www.linkedin.com/in/alessandro-rossi1/" target="_blank" rel="noopener noreferrer" id="author-link">Alessandro Rossi</a></h2>
+        <div class="button-container">
+            <button id="companyLogin" class="disabled">Company Login</button>
+            <button id="tryDemo">Try the demo!</button>
+        </div>
+    </div>
+</body>
+</html>

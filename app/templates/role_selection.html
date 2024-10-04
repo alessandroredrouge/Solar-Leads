@@ -1,19 +1,21 @@
-<!-- Purpose: This is the initial page that appears when the application starts, allowing the user to select between "Canvasser" or "Manager". -->
+<!-- Purpose: This is the role selection page for the demo, allowing the user to select between "Canvasser", "Team Leader" or "Manager". -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Role Selection</title>
+    <title>Solar Leads - Role Selection</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
 <body>
     <div class="flex-container">
+        <button id="backToLogin" onclick="window.location.href='/'">Back to Login</button>
         <h1>Select Your Role</h1>
         <form action="{{ url_for('role_selection') }}" method="post">
-            <div class="role-selection" style="display: flex; justify-content: center; gap: 20px;">
+            <div class="role-selection">
                 <div class="role-option" style="text-align: center;">
                     <img src="{{ url_for('static', filename='images/canvasser.png') }}" alt="Canvasser" style="width: 100px; height: 100px; margin-bottom: 10px;">
                     <button type="submit" name="role" value="Canvasser" style="width: 300px">Canvasser</button>

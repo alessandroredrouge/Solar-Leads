@@ -2,6 +2,25 @@
 // Interacts with: all HTML files in the app/templates directory.
 // Programming Language: JavaScript.
 
+// Functioning of the buttons in the login page
+document.addEventListener('DOMContentLoaded', function() {
+    const companyLoginBtn = document.getElementById('companyLogin');
+    const tryDemoBtn = document.getElementById('tryDemo');
+
+    if (companyLoginBtn) {
+        companyLoginBtn.addEventListener('click', function() {
+            alert('Work in progress, function currently unavailable');
+        });
+    }
+
+    if (tryDemoBtn) {
+        tryDemoBtn.addEventListener('click', function() {
+            window.location.href = '/role_selection';
+        });
+    }
+});
+
+
 // Functioning of the Hide / Unhide Form button in the Submission Form of data_collection.html
 document.addEventListener('DOMContentLoaded', function() {
     const formSection = document.querySelector('.form-section');

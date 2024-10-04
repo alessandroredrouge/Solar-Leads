@@ -8,7 +8,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #F29C38 0%,  #AA1155 100%);
     color: #333;
     min-height: 100vh;
     padding-top: 60px; /* Space for fixed navbar */
@@ -67,11 +67,11 @@ h2 {
 }
 
 #navbar a:hover {
-    color: #667eea;
+    color: #5766a8;
 }
 
 .role-info {
-    background-color: #667eea;
+    background-color: #724E91;
     color: white;
     padding: 10px 15px;
     border-radius: 8px;
@@ -114,14 +114,14 @@ input[type="datetime-local"]:focus,
 select:focus,
 textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #AA1155;
 }
 
 button {
     padding: 0.75rem;
     font-size: 1rem;
     color: #fff;
-    background-color: #667eea;
+    background-color: #5398BE;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -133,7 +133,7 @@ button {
 }
 
 button:hover {
-    background-color: #764ba2;
+    background-color: #05204A;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -166,7 +166,7 @@ th, td {
 }
 
 thead {
-    background-color: #667eea;
+    background-color: #5398BE;
     color: white;
     position: sticky;
     top: 0;
@@ -196,6 +196,21 @@ tbody tr:hover {
 
 .delete-all-btn:hover {
     background-color: #ee5253;
+}
+
+/* Logo */
+.logo-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 80%;
+    max-width: 600px; /* Adjust this value as needed */
+    height: auto;
 }
 
 /* Responsive design */
@@ -243,9 +258,13 @@ tbody tr:hover {
     display: flex;
     justify-content: center;
     gap: 20px;
+    flex-wrap: wrap;
 }
 
 .role-option {
+    flex: 1;
+    min-width: 200px;
+    max-width: 300px;
     text-align: center;
 }
 
@@ -255,9 +274,6 @@ tbody tr:hover {
     margin-bottom: 10px;
 }
 
-.role-option button {
-    width: 120px;
-}
 
 /* Field Support Page Styles */
 .date-selector {
@@ -285,7 +301,7 @@ tbody tr:hover {
 
 .date-selector input[type="date"]:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #AA1155;
 }
 
 .data-tip {
@@ -314,7 +330,7 @@ tbody tr:hover {
 
 .performance-item h2 {
     font-size: 2rem;
-    color: #667eea;
+    color: #AA1155;
     margin-bottom: 0.5rem;
 }
 
@@ -346,6 +362,21 @@ tbody tr:hover {
 @media (max-width: 480px) {
     .performance-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .role-selection {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .role-option {
+        width: 100%;
+    }
+
+    .role-option button {
+        width: 100%;
     }
 }
 

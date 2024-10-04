@@ -12,8 +12,16 @@ import os
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
 
-# Route for Role Selection Page
+# Route for Login Page
 @app.route('/', methods=['GET', 'POST'])
+def login():
+    """
+    Handles the login / demo testing.
+    """
+    return render_template('login.html')
+
+# Route for Role Selection Page
+@app.route('/role_selection', methods=['GET', 'POST'])
 def role_selection():
     """
     Handles the role selection form submission. Sets the user role in the session
