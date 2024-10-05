@@ -1,4 +1,4 @@
-# Solar D2D Lead Generation Tracker MVP
+# Solar Leads MVP
 
 This is an MVP for a software designed to improve door-to-door (D2D) lead generation for solar sales teams. It helps canvassers collect data, optimize routes, and analyze performance.
 
