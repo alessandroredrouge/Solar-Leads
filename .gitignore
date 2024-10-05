@@ -13,7 +13,7 @@ __pycache__/
 # Virtual environment
 venv/
 env/
-venv-solar-d2d-lead-generation-tracker/
+venv-solar-leads
 
 # Distribution / packaging
 .Python
@@ -106,6 +106,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Fake dataset creation
+fictitious_data_creation.py
 
 # End of file
 
