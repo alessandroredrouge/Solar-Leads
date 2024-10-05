@@ -8,6 +8,8 @@
     <title>Solar Leads - Field Support</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='config.js') }}"></script>
+    <script src="{{ url_for('static', filename='maps.js') }}"></script>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
 <!-- Navbar -->
@@ -74,7 +76,8 @@
             </div>
         </div>
 
-        <h2>Prospect's map</h2> <!-- TODO: complete this part -->
+        <h2>Prospect's map</h2>
+        <div id="map" style="height: 400px; width: 100%;"></div>
 
         <h2>Suggested route</h2> <!-- TODO: complete this part -->
 
