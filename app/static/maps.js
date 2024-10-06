@@ -2,8 +2,8 @@ const apiKey = config.googleMapsApiKey;
 
 function initMap() {
     const mapOptions = {
-      center: { lat: 37.7749, lng: -122.4194 }, // Example: San Francisco
-      zoom: 12
+      center: { lat: -28.0167, lng: 153.4000 },
+      zoom: 11
     };
     const map = new google.maps.Map(document.getElementById('map'), mapOptions);
 }

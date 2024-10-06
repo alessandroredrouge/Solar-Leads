@@ -108,7 +108,7 @@ dmypy.json
 .pyre/
 
 # Fake dataset creation
-fictitious_data_creation.py
+fake_data_creation.py
 
 # Configuration js file for API keys 
 config.js
