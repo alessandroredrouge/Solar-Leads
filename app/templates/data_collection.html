@@ -67,27 +67,39 @@
                         <option value="Appointment set">Appointment set</option>
                     </select>
                 </div>
-                <!-- Additional Fields to Appear When 'Appointment set' is Selected -->
+                <!-- Additional Fields to Appear When 'Appointment set' or 'Request to Return later' is Selected -->
                 <div id="appointment-details" style="display: none;">
-                    <!-- Name and Surnmane -->
-                    <div class="form-group">
-                        <label for="name_surname">Name and Surname *</label>
-                        <input type="text" id="name_surname" name="name_surname">
+                    <!-- Contact Details Group -->
+                    <div id="contact-details-group">
+                        <!-- Name and Surname -->
+                        <div class="form-group">
+                            <label for="name_surname">Name and Surname *</label>
+                            <input type="text" id="name_surname" name="name_surname">
+                        </div>
+                        <!-- Contact Email -->
+                        <div class="form-group">
+                            <label for="contact_email">Contact Email *</label>
+                            <input type="email" id="contact_email" name="contact_email">
+                        </div>
+                        <!-- Contact Phone Number -->
+                        <div class="form-group">
+                            <label for="contact_phone">Contact Phone Number *</label>
+                            <input type="tel" id="contact_phone" name="contact_phone">
+                        </div>
                     </div>
-                    <!-- Contact Email -->
-                    <div class="form-group">
-                        <label for="contact_email">Contact Email *</label>
-                        <input type="email" id="contact_email" name="contact_email">
-                    </div>
-                    <!-- Contact Phone Number -->
-                    <div class="form-group">
-                        <label for="contact_phone">Contact Phone Number *</label>
-                        <input type="tel" id="contact_phone" name="contact_phone">
-                    </div>
-                    <!-- Appointment Time -->
-                    <div class="form-group">
-                        <label for="appointment_time">Appointment Time *</label>
-                        <input type="datetime-local" id="appointment_time" name="appointment_time">
+                    
+                    <!-- Time Fields Group -->
+                    <div id="time-fields-group">
+                        <!-- Appointment Time -->
+                        <div class="form-group" id="appointment-time-group" style="display: none;">
+                            <label for="appointment_time">Appointment Time *</label>
+                            <input type="datetime-local" id="appointment_time" name="appointment_time">
+                        </div>
+                        <!-- Follow-up Time -->
+                        <div class="form-group" id="follow-up-time-group" style="display: none;">
+                            <label for="follow_up_time">Follow-up Time *</label>
+                            <input type="datetime-local" id="follow_up_time" name="follow_up_time">
+                        </div>
                     </div>
                 </div>
                 <!-- Optional Fields -->
@@ -217,6 +229,7 @@
             {'key': 'contact_email', 'name': 'Contact Email'},
             {'key': 'contact_phone', 'name': 'Contact Phone Number'},
             {'key': 'appointment_time', 'name': 'Appointment Time'},
+            {'key': 'follow_up_time', 'name': 'Follow-up Time'},
             {'key': 'reason_of_no', 'name': "Reason of 'No'"},
             {'key': 'solar_panels_on_roof', 'name': 'Solar Panels on Roof'},
             {'key': 'roof_type_condition', 'name': 'Roof Type & Condition'},

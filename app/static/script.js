@@ -91,20 +91,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Add current time and date to the submission form in data_collection.html, and show/hide contact-only / appointment details fields
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Adding the current time and date to the Submission Form of data_collection.html, still allowing to modify it if necessary
+    // Adding the current time and date to the Submission Form
     const timestampInput = document.getElementById('timestamp');
     const now = new Date();
-    // Adjust for local timezone offset to get the correct local time
     const timezoneOffset = now.getTimezoneOffset() * 60000; // in milliseconds
     const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, -1);
-    // Format the date and time for the datetime-local input (YYYY-MM-DDTHH:MM)
     const formattedDateTime = localISOTime.slice(0, 16);
-    // Set the value of the input field
     timestampInput.value = formattedDateTime;
-
 
     // Functionality to show/hide contact-only fields
     const prospectResponse = document.getElementById('prospect_response');
@@ -122,51 +117,63 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('number_inhabitants').value = '';
         }
     }
-    // Initial check in case the default value is not 'No answer'
-    toggleContactFields();
-    // Add event listener to the prospect response field
-    prospectResponse.addEventListener('change', function() {
-        toggleContactFields();
-    });
 
     // Functionality to show/hide appointment details
     const appointmentDetails = document.getElementById('appointment-details');
-    const namesurname = document.getElementById('name_surname');
+    const contactDetailsGroup = document.getElementById('contact-details-group');
+    const timeFieldsGroup = document.getElementById('time-fields-group');
+    const appointmentTimeGroup = document.getElementById('appointment-time-group');
+    const followUpTimeGroup = document.getElementById('follow-up-time-group');
+    const nameSurname = document.getElementById('name_surname');
     const contactEmail = document.getElementById('contact_email');
     const contactPhone = document.getElementById('contact_phone');
     const appointmentTime = document.getElementById('appointment_time');
+    const followUpTime = document.getElementById('follow_up_time');
+
     function toggleAppointmentDetails() {
-        if (prospectResponse.value === 'Appointment set') {
+        const isAppointment = prospectResponse.value === 'Appointment set';
+        const isReturnLater = prospectResponse.value === 'Request to Return later';
+
+        if (isAppointment || isReturnLater) {
             appointmentDetails.style.display = 'block';
-            // Make fields required
-            namesurname.required = true;
-            contactEmail.required = true;
-            contactPhone.required = true;
-            appointmentTime.required = true;
-        } else if (prospectResponse.value === 'Request to Return later') {
-            appointmentDetails.style.display = 'block';
-            // Make fields optional
-            namesurname.required = false;
-            contactEmail.required = false;
-            contactPhone.required = false;
-            appointmentTime.required = false;
+            contactDetailsGroup.style.display = 'block';
+            timeFieldsGroup.style.display = 'block';
+            
+            // Set required for contact details only if it's an appointment
+            nameSurname.required = isAppointment;
+            contactEmail.required = isAppointment;
+            contactPhone.required = isAppointment;
+
+            // Show and make required the appropriate time field
+            if (isAppointment) {
+                appointmentTimeGroup.style.display = 'block';
+                followUpTimeGroup.style.display = 'none';
+                appointmentTime.required = true;
+                followUpTime.required = false;
+                followUpTime.value = '';
+            } else {
+                appointmentTimeGroup.style.display = 'none';
+                followUpTimeGroup.style.display = 'block';
+                appointmentTime.required = false;
+                followUpTime.required = true;
+                appointmentTime.value = '';
+            }
         } else {
             appointmentDetails.style.display = 'none';
-            // Remove required attribute
-            namesurname.required = false;
-            contactEmail.required = false;
-            contactPhone.required = false;
-            appointmentTime.required = false;
-            // Clear the values
-            namesurname.value = '';
-            contactEmail.value = '';
-            contactPhone.value = '';
-            appointmentTime.value = '';
+            // Remove required attribute and clear values
+            [nameSurname, contactEmail, contactPhone, appointmentTime, followUpTime].forEach(field => {
+                field.required = false;
+                field.value = '';
+            });
         }
     }
-    // Initial check in case the default value is 'Appointment set'
+
+    // Initial checks
+    toggleContactFields();
     toggleAppointmentDetails();
-    // Add event listener to the prospect response field
+
+    // Add event listeners to the prospect response field
+    prospectResponse.addEventListener('change', toggleContactFields);
     prospectResponse.addEventListener('change', toggleAppointmentDetails);
 });
 
