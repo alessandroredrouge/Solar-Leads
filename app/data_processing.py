@@ -22,7 +22,7 @@ client = MongoClient(MONGO_URI)
 # Select the database and collection
 db = client['solar_d2d_lead_generation_tracker']
 #TODO: remember to change the collection name to 'prospects' when the real data is being collected
-collection = db['fictitious_data'] # 'prospects' is the collection with the real data collected from the field, 'fictitious_data' is the temporarily one with fake data
+collection = db['fake_data_for_demo'] # 'prospects' is the collection with the real data collected from the field, 'fake_data_for_demo' is the temporarily one with fake data
 
 # Local cache
 local_df = None
