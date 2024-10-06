@@ -4,10 +4,10 @@
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
 from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no
-from google_maps import get_map_data
-from database import save_data, delete_data, delete_ALL_data, load_data
+from database import save_data, delete_data, delete_ALL_data, load_data, get_map_data
 from datetime import datetime
 import os
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
@@ -194,15 +194,10 @@ def sync_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# Routes for Google Maps Data
-@app.route('/get_map')
-def get_map():
-    """
-    Retrieves and displays map data using Google Maps API.
-    """
-    map_data = get_map_data()  # Function from google_maps.py
-    return render_template('map.html', map_data=map_data)  # You'll need to create map.html
+# Routes for Map related features
+@app.route('/get_all_map_data')
+def get_all_map_data():
+    return jsonify(get_map_data())
 
 # Routes for Error Handling and User Feedback
 @app.errorhandler(404)

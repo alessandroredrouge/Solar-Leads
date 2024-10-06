@@ -1,65 +1,87 @@
 const apiKey = config.googleMapsApiKey;
 
+let map;
+
 function initMap() {
-    console.log("initMap function called");
-    const mapElement = document.getElementById('map');
-    if (mapElement) {
-        const mapOptions = {
-            center: { lat: -28.0167, lng: 153.4000 },
-            zoom: 11
-        };
-        const map = new google.maps.Map(mapElement, mapOptions);
-        console.log("Map initialized");
-    } else {
-        console.log("No map element found, skipping map initialization");
-    }
+    const mapOptions = {
+        center: { lat: -28.0167, lng: 153.4000 }, // Gold Coast coordinates, where the pre-populated dataset is set
+        zoom: 11
+    };
+    map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    fetchAllMapData();
 }
 
-function initAutocomplete() {
-    console.log("initAutocomplete function called");
-    const input = document.getElementById('address');
-    if (!input) {
-        console.log("No address input found, skipping autocomplete initialization");
-        return;
-    }
+function fetchAllMapData() {
+    fetch('/get_all_map_data')
+        .then(response => response.json())
+        .then(data => {
+            createMarkers(data);
+        })
+        .catch(error => console.error('Error:', error));
+}
 
-    const options = {
-        types: ['address'],
-        fields: ['formatted_address', 'geometry']
+function createMarkers(data) {
+    const geocoder = new google.maps.Geocoder();
+    data.forEach(item => {
+        geocoder.geocode({ 'address': item.address }, function(results, status) {
+            if (status === 'OK') {
+                const marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location,
+                    icon: getMarkerIcon(item.prospect_response)
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: createInfoWindowContent(item)
+                });
+
+                marker.addListener('click', function() {
+                    infoWindow.open(map, marker);
+                });
+            } else {
+                console.error('Geocode was not successful for the following reason: ' + status);
+            }
+        });
+    });
+}
+// TODO: change colors for better clarity
+function getMarkerIcon(prospectResponse) {
+    // Define color mapping based on prospect_response
+    const colorMap = {
+        'Appointment set': 'green',
+        'Positive conversation (Detailed)': 'pink',
+        'Positive conversation (Initial)': 'yellow',
+        'Request to Return later': 'blue',
+        'Not interested (Homeowner)': 'red',
+        'Not interested (Renter)': 'orange',
+        'No answer': 'gray',
     };
 
-    console.log("Initializing autocomplete");
-    const autocomplete = new google.maps.places.Autocomplete(input, options);
-
-    autocomplete.addListener('place_changed', function() {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) {
-            console.log("No details available for input: '" + place.name + "'");
-            return;
-        }
-
-        console.log('Selected address:', place.formatted_address);
-        console.log('Latitude:', place.geometry.location.lat());
-        console.log('Longitude:', place.geometry.location.lng());
-    });
-
-    console.log("Autocomplete initialized");
+    const color = colorMap[prospectResponse] || 'purple'; // Default color
+    return `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`;
 }
 
+function createInfoWindowContent(item) {
+    let content = '<div style="max-width: 300px; word-wrap: break-word;">';
+    for (const [key, value] of Object.entries(item)) {
+        content += `<p><strong>${key}:</strong> ${value}</p>`;
+    }
+    content += '</div>';
+    return content;
+}
+
+// Load the Google Maps script
 function loadGoogleMapsScript() {
-    console.log("Loading Google Maps script");
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMapAndAutocomplete`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
 }
 
-function initMapAndAutocomplete() {
-    console.log("initMapAndAutocomplete called");
-    initMap();
-    initAutocomplete();
-}
+// TODO: add Legend for the maps colors
 
-console.log("maps.js loaded, adding DOMContentLoaded event listener");
-document.addEventListener('DOMContentLoaded', loadGoogleMapsScript);
+// TODO: allow to select the visualization of the results of one specific user
+
+// Call this function when the page loads
+document.addEventListener('DOMContentLoaded', loadGoogleMapsScript)

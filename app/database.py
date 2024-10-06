@@ -6,6 +6,9 @@ import os
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from bson.objectid import ObjectId
+from bson import json_util
+import json
+from datetime import datetime
 
 # Load environment variables from .env file
 load_dotenv()
@@ -56,3 +59,15 @@ def load_data():
     # Retrieve all documents from the MongoDB collection
     data = list(collection.find().sort('_id', -1))
     return data
+
+# Function to load data for the maps
+def get_map_data():
+    # Retrieve all documents from the MongoDB collection with necessary fields
+    data = load_data()
+    
+     # Convert ObjectId and datetime objects to strings
+    for item in data:
+        item['_id'] = str(item['_id'])
+        item['timestamp'] = str(item['timestamp'])
+    
+    return json.loads(json_util.dumps(data))
