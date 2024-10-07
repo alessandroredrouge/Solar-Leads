@@ -170,9 +170,45 @@ function createInfoWindowContent(item) {
     return content;
 }
 
+// Address autocomplete function in the Data Collection page
+function initAutocomplete() {
+    const input = document.getElementById('address');
+    if (!input) return; // Exit if the address input doesn't exist on the page
+
+    const options = {
+        types: ['address'],
+        //componentRestrictions: { country: 'au' }, // Restrict to Australia
+        fields: ['formatted_address', 'geometry']
+    };
+
+    const autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) {
+            console.log("No details available for input: '" + place.name + "'");
+            return;
+        }
+
+        // You can access the selected place's details here
+        const address = place.formatted_address;
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+
+        console.log('Selected address:', address);
+        console.log('Latitude:', lat);
+        console.log('Longitude:', lng);
+
+        // Optionally, you can center the map on the selected address
+        map.setCenter(place.geometry.location);
+        map.setZoom(15);
+    });
+}
+
+
 function loadGoogleMapsScript() {
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap&callback=initAutocomplete`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
