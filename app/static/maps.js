@@ -199,19 +199,37 @@ function initAutocomplete() {
         console.log('Latitude:', lat);
         console.log('Longitude:', lng);
 
-        // Optionally, you can center the map on the selected address
-        map.setCenter(place.geometry.location);
-        map.setZoom(15);
+        if (window.map) {
+            window.map.setCenter(place.geometry.location);
+            window.map.setZoom(15);
+        }
+
     });
 }
 
-
 function loadGoogleMapsScript() {
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap&callback=initAutocomplete`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
+    if (window.google && window.google.maps) {
+        // Google Maps API is already loaded
+        initGoogleMapsFeatures();
+    } else {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMapsFeatures`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+}
+
+function initGoogleMapsFeatures() {
+    console.log("Initializing Google Maps features");
+    if (document.getElementById('map')) {
+        console.log("Initializing map");
+        initMap();
+    }
+    if (document.getElementById('address')) {
+        console.log("Initializing autocomplete");
+        initAutocomplete();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', loadGoogleMapsScript);
