@@ -45,7 +45,7 @@ function createLegend() {
     legend.style.overflowY = 'auto';
 
     const title = document.createElement('h4');
-    title.textContent = 'Legend';
+    title.textContent = 'Prospect response';
     title.style.margin = '0 0 5px 0';
     legend.appendChild(title);
 
