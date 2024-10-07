@@ -281,7 +281,6 @@ def get_reasons_of_no():
 
 # Functions for the ML model
 
-
 def prepare_data_for_prediction(prospect_data, case_type):
     features = {
         'solar_panels_on_roof': prospect_data.get('solar_panels_on_roof'),

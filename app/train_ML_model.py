@@ -9,8 +9,7 @@ def prepare_data():
 
 def train_and_save_model():
     predictor = SolarLeadPredictor()
-    data = prepare_data()
-    predictor.train(data)
+    predictor.train()
     predictor.save_model('solar_lead_predictor.joblib')
     print("Model trained and saved successfully.")
 
