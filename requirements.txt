@@ -11,6 +11,10 @@ gunicorn>=22.0.0, <23.0.0
 numpy==2.1.1
 tzdata>=2024.1
 pymongo>=4.9.1,<5.0.0
-
+scikit-learn==1.5.2
+joblib==1.4.2
+scipy==1.14.1
+threadpoolctl==3.5.0
+imbalanced-learn==0.12.4
 
 

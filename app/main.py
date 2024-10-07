@@ -3,14 +3,17 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
-from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no
+from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction
 from database import save_data, delete_data, delete_ALL_data, load_data, get_map_data
 from datetime import datetime
+from ML_model import load_trained_model
 import os
+
 
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
+model = load_trained_model()
 
 # Route for Login Page
 @app.route('/', methods=['GET', 'POST'])
@@ -198,6 +201,14 @@ def sync_data():
 @app.route('/get_all_map_data')
 def get_all_map_data():
     return jsonify(get_map_data())
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    prospect_data = request.json
+    case_type = prospect_data.pop('case_type')  # 'No answer' or 'Request to Return later'
+    formatted_data = prepare_data_for_prediction(prospect_data, case_type)
+    probability = model.predict(formatted_data, case_type)
+    return jsonify({'probability': probability})
 
 # Routes for Error Handling and User Feedback
 @app.errorhandler(404)

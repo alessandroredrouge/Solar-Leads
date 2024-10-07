@@ -279,4 +279,23 @@ def get_reasons_of_no():
     
     return reason_percentages
 
-# Add more functions for complex calculations using local_df as needed
+# Functions for the ML model
+
+
+def prepare_data_for_prediction(prospect_data, case_type):
+    features = {
+        'solar_panels_on_roof': prospect_data.get('solar_panels_on_roof'),
+        'roof_type_condition': prospect_data.get('roof_type_condition'),
+        'shading_issues': prospect_data.get('shading_issues'),
+        'appliances': prospect_data.get('appliances', ''),
+    }
+    
+    if case_type == 'Request to Return later':
+        features.update({
+            'electricity_bill_estimate': prospect_data.get('electricity_bill_estimate'),
+            'number_of_decision_makers': prospect_data.get('number_of_decision_makers'),
+            'approximate_age': prospect_data.get('approximate_age'),
+            'number_inhabitants': prospect_data.get('number_inhabitants'),
+        })
+    
+    return features
