@@ -69,5 +69,7 @@ def get_map_data():
     for item in data:
         item['_id'] = str(item['_id'])
         item['timestamp'] = str(item['timestamp'])
+        item['appointment_time'] = str(item['appointment_time'])
+        item['follow_up_time'] = str(item['follow_up_time'])
     
     return json.loads(json_util.dumps(data))
