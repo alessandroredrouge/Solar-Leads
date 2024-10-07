@@ -1,17 +1,117 @@
 const apiKey = config.googleMapsApiKey;
 
 let map;
+let markers = [];
+let visibleResponses = new Set();
+let legendVisible = true;
+
+const colorMap = {
+    'Appointment set': 'green',
+    'Positive conversation (Detailed)': 'lightblue',
+    'Positive conversation (Initial)': 'blue',
+    'Request to Return later': 'yellow',
+    'Not interested (Homeowner)': 'red',
+    'Not interested (Renter)': 'orange',
+    'No answer': 'gray',
+    'Undefined': 'white'
+};
 
 function initMap() {
     const mapOptions = {
-        center: { lat: -28.0167, lng: 153.4000 }, // Gold Coast coordinates, where the pre-populated dataset is set
+        center: { lat: -28.0167, lng: 153.4000 },
         zoom: 11
     };
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+    const legend = createLegend();
+    map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
+
+    const toggleButton = createToggleButton();
+    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
+
     fetchAllMapData();
 }
 
+function createLegend() {
+    const legend = document.createElement('div');
+    legend.id = 'legend';
+    legend.style.backgroundColor = 'white';
+    legend.style.padding = '10px';
+    legend.style.margin = '10px';
+    legend.style.border = '1px solid #999';
+    legend.style.borderRadius = '3px';
+    legend.style.fontSize = '12px';
+    legend.style.maxHeight = '50%';
+    legend.style.overflowY = 'auto';
+
+    const title = document.createElement('h4');
+    title.textContent = 'Legend';
+    title.style.margin = '0 0 5px 0';
+    legend.appendChild(title);
+
+    for (const [response, color] of Object.entries(colorMap)) {
+        const div = document.createElement('div');
+        div.innerHTML = `${createLegendIcon(response, color)} ${response}`;
+        div.style.cursor = 'pointer';
+        div.style.opacity = '1';
+        div.style.marginBottom = '5px';
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        
+        div.addEventListener('click', () => toggleMarkers(response, div));
+        
+        legend.appendChild(div);
+        visibleResponses.add(response);
+    }
+
+    return legend;
+}
+
+
+function createLegendIcon(response, color) {
+    return `<svg width="20" height="20" style="margin-right: 5px;">
+        <circle cx="10" cy="10" r="8" fill="${color}" stroke="black" stroke-width="1"/>
+    </svg>`;
+}
+
+function createToggleButton() {
+    const button = document.createElement('button');
+    button.textContent = 'Toggle Legend';
+    button.style.backgroundColor = 'gray';
+    button.style.border = '1px solid #999';
+    button.style.padding = '5px 10px';
+    button.style.margin = '10px';
+    button.style.cursor = 'pointer';
+
+    button.addEventListener('click', () => {
+        const legend = document.getElementById('legend');
+        legendVisible = !legendVisible;
+        legend.style.display = legendVisible ? 'block' : 'none';
+    });
+
+    return button;
+}
+
+function toggleMarkers(response, legendItem) {
+    if (visibleResponses.has(response)) {
+        visibleResponses.delete(response);
+        legendItem.style.opacity = '0.5';
+    } else {
+        visibleResponses.add(response);
+        legendItem.style.opacity = '1';
+    }
+
+    markers.forEach(marker => {
+        if (marker.response === response) {
+            marker.setVisible(visibleResponses.has(response));
+        }
+    });
+}
+
 function fetchAllMapData() {
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+    
     fetch('/get_all_map_data')
         .then(response => response.json())
         .then(data => {
@@ -31,6 +131,8 @@ function createMarkers(data) {
                     icon: getMarkerIcon(item.prospect_response)
                 });
 
+                marker.response = item.prospect_response;
+
                 const infoWindow = new google.maps.InfoWindow({
                     content: createInfoWindowContent(item)
                 });
@@ -38,28 +140,26 @@ function createMarkers(data) {
                 marker.addListener('click', function() {
                     infoWindow.open(map, marker);
                 });
+
+                markers.push(marker);
             } else {
                 console.error('Geocode was not successful for the following reason: ' + status);
             }
         });
     });
 }
-// TODO: change colors for better clarity
-function getMarkerIcon(prospectResponse) {
-    // Define color mapping based on prospect_response
-    const colorMap = {
-        'Appointment set': 'green',
-        'Positive conversation (Detailed)': 'pink',
-        'Positive conversation (Initial)': 'yellow',
-        'Request to Return later': 'blue',
-        'Not interested (Homeowner)': 'red',
-        'Not interested (Renter)': 'orange',
-        'No answer': 'gray',
-    };
 
-    const color = colorMap[prospectResponse] || 'purple'; // Default color
-    return `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`;
+function getMarkerIcon(prospectResponse) {
+    return {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: colorMap[prospectResponse],
+        fillOpacity: 1,
+        strokeWeight: 1,
+        strokeColor: '#000',
+        scale: 8
+    };
 }
+
 
 function createInfoWindowContent(item) {
     let content = '<div style="max-width: 300px; word-wrap: break-word;">';
@@ -70,7 +170,6 @@ function createInfoWindowContent(item) {
     return content;
 }
 
-// Load the Google Maps script
 function loadGoogleMapsScript() {
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap`;
@@ -79,9 +178,4 @@ function loadGoogleMapsScript() {
     document.head.appendChild(script);
 }
 
-// TODO: add Legend for the maps colors
-
-// TODO: allow to select the visualization of the results of one specific user
-
-// Call this function when the page loads
-document.addEventListener('DOMContentLoaded', loadGoogleMapsScript)
+document.addEventListener('DOMContentLoaded', loadGoogleMapsScript);
