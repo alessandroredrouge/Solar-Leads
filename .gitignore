@@ -109,6 +109,7 @@ dmypy.json
 
 # Fake dataset creation
 fake_data_creation.py
+improve_fake_data.py
 
 # Configuration js file for API keys 
 config.js
