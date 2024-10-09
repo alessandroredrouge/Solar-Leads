@@ -9,6 +9,7 @@ from bson.objectid import ObjectId
 from bson import json_util
 import json
 from datetime import datetime
+import pandas as pd
 
 # Load environment variables from .env file
 load_dotenv()
@@ -62,10 +63,8 @@ def load_data():
 
 # Function to load data for the maps
 def get_map_data():
-    # Retrieve all documents from the MongoDB collection with necessary fields
     data = load_data()
-    
-     # Convert ObjectId and datetime objects to strings
+    # Convert ObjectId and datetime objects to strings
     for item in data:
         item['_id'] = str(item['_id'])
         item['timestamp'] = str(item['timestamp'])
@@ -73,3 +72,19 @@ def get_map_data():
         item['follow_up_time'] = str(item['follow_up_time'])
     
     return json.loads(json_util.dumps(data))
+
+# Function to fetch relevant data for predictions
+def get_prediction_data():
+    data = list(collection.find({
+        'prospect_response': {'$in': ['No answer', 'Request to Return later']}
+    }))
+    return pd.DataFrame(data)
+
+def update_prediction_fields(document_id, probability, worth_returning):
+    collection.update_one(
+        {'_id': document_id},
+        {'$set': {
+            'ML_model_pred_prob_of_app': probability,
+            'ML_model_pred_worth_returning': worth_returning
+        }}
+    )

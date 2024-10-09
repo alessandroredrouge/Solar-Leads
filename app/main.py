@@ -13,7 +13,7 @@ import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
-model = load_trained_model()
+ml_model = load_trained_model()
 
 # Route for Login Page
 @app.route('/', methods=['GET', 'POST'])
@@ -200,14 +200,32 @@ def sync_data():
 # Routes for Map related features
 @app.route('/get_all_map_data')
 def get_all_map_data():
-    return jsonify(get_map_data())
+    data = get_map_data()
+    
+    # Filter for 'No answer' and 'Request to Return later' responses
+    prediction_data = [item for item in data if item['prospect_response'] in ['No answer', 'Request to Return later']]
+    
+    # Perform batch prediction
+    predictions = ml_model.predict_batch(prediction_data)
+    
+    # Update the data with prediction results
+    for item in data:
+        if item['prospect_response'] in ['No answer', 'Request to Return later']:
+            prediction = next((p for p in predictions if p['_id'] == item['_id']), None)
+            if prediction:
+                item['ML_model_pred_prob_of_app'] = prediction['probability']
+                item['ML_model_pred_worth_returning'] = prediction['worth_returning']
+    
+    return jsonify(data)
 
 @app.route('/predict', methods=['POST'])
 def predict():
     prospect_data = request.json
-    case_type = prospect_data.pop('case_type')  # 'No answer' or 'Request to Return later'
+    case_type = prospect_data.pop('prospect_response', None)
+    if case_type not in ['No answer', 'Request to Return later']:
+        return jsonify({'error': 'Invalid prospect_response'}), 400
     formatted_data = prepare_data_for_prediction(prospect_data, case_type)
-    probability = model.predict(formatted_data, case_type)
+    probability = ml_model.predict(formatted_data, case_type)
     return jsonify({'probability': probability})
 
 # Routes for Error Handling and User Feedback

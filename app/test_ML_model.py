@@ -2,7 +2,7 @@ from ML_model import load_trained_model
 from database import load_data
 import random
 
-def get_test_cases(data, n=10):
+def get_test_cases(data, n=100):
     no_answer = [d for d in data if d['prospect_response'] == 'No answer']
     return_later = [d for d in data if d['prospect_response'] == 'Request to Return later']
     
@@ -25,6 +25,7 @@ def main():
         probability = model.predict(case, case_type)
         worth_returning = "Yes" if probability > 0.5 else "No"
         
+        print(f"Case ID: {case['_id']}")
         print(f"Case Type: {case_type}")
         print(f"Probability of Appointment: {probability:.2f}")
         print(f"Worth Returning: {worth_returning}")
