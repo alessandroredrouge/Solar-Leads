@@ -115,6 +115,16 @@ def submit_data():
     home_characteristics = request.form.getlist('appliances[]')
     collected_data['appliances'] = ' - '.join(home_characteristics)
     collected_data.pop('appliances[]', None)
+    
+    # Add ML model prediction if applicable
+    if collected_data['prospect_response'] in ['No answer', 'Request to Return later']:
+        probability = ml_model.predict(collected_data, collected_data['prospect_response'])
+        collected_data['ML_model_pred_prob_of_app'] = probability
+        collected_data['ML_model_pred_worth_returning'] = "Yes" if probability > 0.5 else "No"
+    else:
+        collected_data['ML_model_pred_prob_of_app'] = 'n/a'
+        collected_data['ML_model_pred_worth_returning'] = 'n/a'
+    
     save_data(collected_data, role, nickname)  # Save processed data to MongoDB
     flash('Data submitted successfully!', 'success')  # Optional: Feedback to user
     return redirect(url_for('data_collection'))  # Redirect back to data collection page
@@ -201,21 +211,6 @@ def sync_data():
 @app.route('/get_all_map_data')
 def get_all_map_data():
     data = get_map_data()
-    
-    # Filter for 'No answer' and 'Request to Return later' responses
-    prediction_data = [item for item in data if item['prospect_response'] in ['No answer', 'Request to Return later']]
-    
-    # Perform batch prediction
-    predictions = ml_model.predict_batch(prediction_data)
-    
-    # Update the data with prediction results
-    for item in data:
-        if item['prospect_response'] in ['No answer', 'Request to Return later']:
-            prediction = next((p for p in predictions if p['_id'] == item['_id']), None)
-            if prediction:
-                item['ML_model_pred_prob_of_app'] = prediction['probability']
-                item['ML_model_pred_worth_returning'] = prediction['worth_returning']
-    
     return jsonify(data)
 
 @app.route('/predict', methods=['POST'])

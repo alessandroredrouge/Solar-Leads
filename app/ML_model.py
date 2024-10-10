@@ -109,11 +109,6 @@ class SolarLeadPredictor:
         else:
             raise ValueError("Invalid case_type. Must be 'No answer' or 'Request to Return later'")
         
-        worth_returning = "Yes" if probability > 0.5 else "No"
-        
-        # Update the prediction fields in the database
-        update_prediction_fields(features['_id'], probability, worth_returning)
-        
         return probability
 
     def predict_batch(self, data):
