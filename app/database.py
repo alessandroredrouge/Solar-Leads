@@ -70,6 +70,9 @@ def get_map_data():
         item['timestamp'] = str(item['timestamp'])
         item['appointment_time'] = str(item['appointment_time'])
         item['follow_up_time'] = str(item['follow_up_time'])
+        # Ensure ML model prediction fields are included
+        item['ML_model_pred_prob_of_app'] = item.get('ML_model_pred_prob_of_app', 'n/a')
+        item['ML_model_pred_worth_returning'] = item.get('ML_model_pred_worth_returning', 'n/a')
     
     return json.loads(json_util.dumps(data))
 

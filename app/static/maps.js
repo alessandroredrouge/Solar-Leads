@@ -9,9 +9,11 @@ const colorMap = {
     'Appointment set': 'green',
     'Positive conversation (Detailed)': 'lightblue',
     'Positive conversation (Initial)': 'blue',
+    'Request to Return later: worth returning (AI powered feature)': 'yellow',
     'Request to Return later': 'yellow',
     'Not interested (Homeowner)': 'red',
     'Not interested (Renter)': 'orange',
+    'No answer: worth returning (AI powered feature)': 'gray',
     'No answer': 'gray',
     'Undefined': 'white'
 };
@@ -49,9 +51,22 @@ function createLegend() {
     title.style.margin = '0 0 5px 0';
     legend.appendChild(title);
 
-    for (const [response, color] of Object.entries(colorMap)) {
+    const orderedResponses = [
+        'Appointment set',
+        'Positive conversation (Detailed)',
+        'Positive conversation (Initial)',
+        'Request to Return later: worth returning (AI powered feature)',
+        'Request to Return later',
+        'Not interested (Homeowner)',
+        'Not interested (Renter)',
+        'No answer: worth returning (AI powered feature)',
+        'No answer',
+        'Undefined'
+    ];
+
+    orderedResponses.forEach(response => {
         const div = document.createElement('div');
-        div.innerHTML = `${createLegendIcon(response, color)} ${response}`;
+        div.innerHTML = `${createLegendIcon(response)} ${response}`;
         div.style.cursor = 'pointer';
         div.style.opacity = '1';
         div.style.marginBottom = '5px';
@@ -62,16 +77,26 @@ function createLegend() {
         
         legend.appendChild(div);
         visibleResponses.add(response);
-    }
+    });
 
     return legend;
 }
 
-
-function createLegendIcon(response, color) {
-    return `<svg width="20" height="20" style="margin-right: 5px;">
-        <circle cx="10" cy="10" r="8" fill="${color}" stroke="black" stroke-width="1"/>
-    </svg>`;
+function createLegendIcon(response) {
+    const color = colorMap[response];
+    const isWorthReturning = response.includes('worth returning');
+    
+    let svg = `<svg width="20" height="20" style="margin-right: 5px;">
+        <circle cx="10" cy="10" r="8" fill="${color}" stroke="black" stroke-width="1"/>`;
+    
+    if (isWorthReturning) {
+        svg += `<line x1="6" y1="10" x2="14" y2="10" stroke="green" stroke-width="2"/>
+                <line x1="10" y1="6" x2="10" y2="14" stroke="green" stroke-width="2"/>`;
+    }
+    
+    svg += '</svg>';
+    
+    return svg;
 }
 
 function createToggleButton() {
@@ -125,13 +150,23 @@ function createMarkers(data) {
     data.forEach(item => {
         geocoder.geocode({ 'address': item.address }, function(results, status) {
             if (status === 'OK') {
+                const isWorthReturning = item.ML_model_pred_worth_returning === 'Yes';
+                let prospectResponse = item.prospect_response;
+                if (isWorthReturning) {
+                    if (prospectResponse === 'Request to Return later') {
+                        prospectResponse = 'Request to Return later: worth returning (AI powered feature)';
+                    } else if (prospectResponse === 'No answer') {
+                        prospectResponse = 'No answer: worth returning (AI powered feature)';
+                    }
+                }
+
                 const marker = new google.maps.Marker({
                     map: map,
                     position: results[0].geometry.location,
-                    icon: getMarkerIcon(item.prospect_response)
+                    icon: getMarkerIcon(prospectResponse, isWorthReturning)
                 });
 
-                marker.response = item.prospect_response;
+                marker.response = prospectResponse;
 
                 const infoWindow = new google.maps.InfoWindow({
                     content: createInfoWindowContent(item)
@@ -149,17 +184,28 @@ function createMarkers(data) {
     });
 }
 
-function getMarkerIcon(prospectResponse) {
+function getMarkerIcon(prospectResponse, isWorthReturning) {
+    const color = colorMap[prospectResponse];
+    const size = 20;
+    const halfSize = size / 2;
+    
+    let svgPath = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="${halfSize}" cy="${halfSize}" r="${halfSize - 1}" fill="${color}" stroke="black" stroke-width="1"/>`;
+    
+    if (isWorthReturning) {
+        svgPath += `<line x1="${halfSize - 4}" y1="${halfSize}" x2="${halfSize + 4}" y2="${halfSize}" stroke="green" stroke-width="2"/>
+                    <line x1="${halfSize}" y1="${halfSize - 4}" x2="${halfSize}" y2="${halfSize + 4}" stroke="green" stroke-width="2"/>`;
+    }
+    
+    svgPath += '</svg>';
+
     return {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: colorMap[prospectResponse],
-        fillOpacity: 1,
-        strokeWeight: 1,
-        strokeColor: '#000',
-        scale: 8
+        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgPath),
+        scaledSize: new google.maps.Size(size, size),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(halfSize, halfSize)
     };
 }
-
 
 function createInfoWindowContent(item) {
     let content = '<div style="max-width: 300px; word-wrap: break-word;">';
