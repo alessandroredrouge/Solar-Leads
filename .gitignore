@@ -114,5 +114,8 @@ improve_fake_data.py
 # Configuration js file for API keys 
 config.js
 
+# File to use Google Maps instead of a free alternative (currently not used)
+maps_google.js
+
 # End of file
 

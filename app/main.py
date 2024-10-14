@@ -4,7 +4,7 @@
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
 from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction
-from database import save_data, delete_data, delete_ALL_data, load_data, get_map_data
+from database import save_data, delete_data, delete_ALL_data, load_data, get_map_data, get_last_available_date_for_user
 from datetime import datetime
 from ML_model import load_trained_model
 import os
@@ -124,9 +124,13 @@ def submit_data():
     else:
         collected_data['ML_model_pred_prob_of_app'] = 'n/a'
         collected_data['ML_model_pred_worth_returning'] = 'n/a'
+
+    # Extract latitude and longitude and transform them into float
+    collected_data['latitude'] = float(collected_data.get('latitude', 0))
+    collected_data['longitude'] = float(collected_data.get('longitude', 0))
     
     save_data(collected_data, role, nickname)  # Save processed data to MongoDB
-    flash('Data submitted successfully!', 'success')  # Optional: Feedback to user
+    flash('Data submitted successfully!', 'success')  # Feedback to user
     return redirect(url_for('data_collection'))  # Redirect back to data collection page
 
 @app.route('/delete/<prospect_id>', methods=['DELETE'])
@@ -136,7 +140,7 @@ def delete_prospect(prospect_id):
     Processes and deletes the row of data indicated by the user from the database.
     """
     delete_data(prospect_id)
-    flash('Data eliminated successfully!', 'success')  # Optional: Feedback to user 
+    flash('Data eliminated successfully!', 'success')  # Feedback to user 
     return jsonify({'success': True}), 200
 
 @app.route('/delete-ALL', methods=['DELETE'])
@@ -146,7 +150,7 @@ def delete_all():
     Processes and deletes the row of data indicated by the user from the database.
     """
     delete_ALL_data()
-    flash('All data eliminated successfully!', 'success')  # Optional: Feedback to user 
+    flash('All data eliminated successfully!', 'success')  # Feedback to user 
     return jsonify({'success': True}), 200
   
 # Routes for Data Processing
@@ -197,6 +201,13 @@ def get_reasons_of_no_data():
     data = get_reasons_of_no()
     return jsonify(data)
 
+@app.route('/get_last_available_date', methods=['GET'])
+def get_last_available_date():
+    role = session.get('role')
+    nickname = session.get('nickname')
+    last_date = get_last_available_date_for_user(role, nickname)
+    return jsonify({'last_date': last_date})
+
 @app.route('/sync_data', methods=['POST'])
 def sync_data():
     try:
@@ -213,6 +224,7 @@ def get_all_map_data():
     data = get_map_data()
     return jsonify(data)
 
+# Routes for ML model predictions
 @app.route('/predict', methods=['POST'])
 def predict():
     prospect_data = request.json

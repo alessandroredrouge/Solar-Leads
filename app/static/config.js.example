@@ -1,0 +1,3 @@
+const config = {
+  geoapifyApiKey: '__GEOAPIFY_API_KEY__'
+};

@@ -1,281 +1,223 @@
-const apiKey = config.googleMapsApiKey;
+const apiKey = config.geoapifyApiKey;
 
-let map;
-let markers = [];
-let visibleResponses = new Set();
-let legendVisible = true;
+function addressAutocomplete(containerElement, callback, options) {
+    const MIN_ADDRESS_LENGTH = 3;
+    const DEBOUNCE_DELAY = 300;
 
-const colorMap = {
-    'Appointment set': 'green',
-    'Positive conversation (Detailed)': 'lightblue',
-    'Positive conversation (Initial)': 'blue',
-    'Request to Return later: worth returning (AI powered feature)': 'yellow',
-    'Request to Return later': 'yellow',
-    'Not interested (Homeowner)': 'red',
-    'Not interested (Renter)': 'orange',
-    'No answer: worth returning (AI powered feature)': 'gray',
-    'No answer': 'gray',
-    'Undefined': 'white'
-};
+    // Use the existing input element
+    const inputElement = containerElement.querySelector("#address");
+    const inputContainerElement = containerElement;
 
-function initMap() {
-    const mapOptions = {
-        center: { lat: -28.0167, lng: 153.4000 },
-        zoom: 11
-    };
-    map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    // Set placeholder for input element
+    inputElement.setAttribute("placeholder", options.placeholder);
 
-    const legend = createLegend();
-    map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
-
-    const toggleButton = createToggleButton();
-    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
-
-    fetchAllMapData();
-}
-
-function createLegend() {
-    const legend = document.createElement('div');
-    legend.id = 'legend';
-    legend.style.backgroundColor = 'white';
-    legend.style.padding = '10px';
-    legend.style.margin = '10px';
-    legend.style.border = '1px solid #999';
-    legend.style.borderRadius = '3px';
-    legend.style.fontSize = '12px';
-    legend.style.maxHeight = '50%';
-    legend.style.overflowY = 'auto';
-
-    const title = document.createElement('h4');
-    title.textContent = 'Prospect response';
-    title.style.margin = '0 0 5px 0';
-    legend.appendChild(title);
-
-    const orderedResponses = [
-        'Appointment set',
-        'Positive conversation (Detailed)',
-        'Positive conversation (Initial)',
-        'Request to Return later: worth returning (AI powered feature)',
-        'Request to Return later',
-        'Not interested (Homeowner)',
-        'Not interested (Renter)',
-        'No answer: worth returning (AI powered feature)',
-        'No answer',
-        'Undefined'
-    ];
-
-    orderedResponses.forEach(response => {
-        const div = document.createElement('div');
-        div.innerHTML = `${createLegendIcon(response)} ${response}`;
-        div.style.cursor = 'pointer';
-        div.style.opacity = '1';
-        div.style.marginBottom = '5px';
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        
-        div.addEventListener('click', () => toggleMarkers(response, div));
-        
-        legend.appendChild(div);
-        visibleResponses.add(response);
+    // add input field clear button
+    const clearButton = document.createElement("div");
+    clearButton.classList.add("clear-button");
+    addIcon(clearButton);
+    clearButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+        inputElement.value = '';
+        callback(null);
+        clearButton.classList.remove("visible");
+        closeDropDownList();
     });
+    inputContainerElement.appendChild(clearButton);
 
-    return legend;
-}
+    /* We will call the API with a timeout to prevent unnecessary API activity.*/
+    let currentTimeout;
 
-function createLegendIcon(response) {
-    const color = colorMap[response];
-    const isWorthReturning = response.includes('worth returning');
-    
-    let svg = `<svg width="20" height="20" style="margin-right: 5px;">
-        <circle cx="10" cy="10" r="8" fill="${color}" stroke="black" stroke-width="1"/>`;
-    
-    if (isWorthReturning) {
-        svg += `<line x1="6" y1="10" x2="14" y2="10" stroke="green" stroke-width="2"/>
-                <line x1="10" y1="6" x2="10" y2="14" stroke="green" stroke-width="2"/>`;
-    }
-    
-    svg += '</svg>';
-    
-    return svg;
-}
+    /* Save the current request promise reject function. To be able to cancel the promise when a new request comes */
+    let currentPromiseReject;
 
-function createToggleButton() {
-    const button = document.createElement('button');
-    button.textContent = 'Toggle Legend';
-    button.style.backgroundColor = 'gray';
-    button.style.border = '1px solid #999';
-    button.style.padding = '5px 10px';
-    button.style.margin = '10px';
-    button.style.cursor = 'pointer';
+    /* Focused item in the autocomplete list. This variable is used to navigate with buttons */
+    let focusedItemIndex;
 
-    button.addEventListener('click', () => {
-        const legend = document.getElementById('legend');
-        legendVisible = !legendVisible;
-        legend.style.display = legendVisible ? 'block' : 'none';
-    });
+    /* Current autocomplete items data (GeoJSON.Feature) */
+    let currentItems;
 
-    return button;
-}
+    /* Process a user input: */
+    inputElement.addEventListener("input", function(e) {
+        const currentValue = this.value;
 
-function toggleMarkers(response, legendItem) {
-    if (visibleResponses.has(response)) {
-        visibleResponses.delete(response);
-        legendItem.style.opacity = '0.5';
-    } else {
-        visibleResponses.add(response);
-        legendItem.style.opacity = '1';
-    }
+        /* Close any already open dropdown list */
+        closeDropDownList();
 
-    markers.forEach(marker => {
-        if (marker.response === response) {
-            marker.setVisible(visibleResponses.has(response));
+        // Cancel previous timeout
+        if (currentTimeout) {
+            clearTimeout(currentTimeout);
         }
-    });
-}
 
-function fetchAllMapData() {
-    markers.forEach(marker => marker.setMap(null));
-    markers = [];
-    
-    fetch('/get_all_map_data')
-        .then(response => response.json())
-        .then(data => {
-            createMarkers(data);
-        })
-        .catch(error => console.error('Error:', error));
-}
+        // Cancel previous request promise
+        if (currentPromiseReject) {
+            currentPromiseReject({
+                canceled: true
+            });
+        }
 
-function createMarkers(data) {
-    const geocoder = new google.maps.Geocoder();
-    data.forEach(item => {
-        geocoder.geocode({ 'address': item.address }, function(results, status) {
-            if (status === 'OK') {
-                const isWorthReturning = item.ML_model_pred_worth_returning === 'Yes';
-                let prospectResponse = item.prospect_response;
-                if (isWorthReturning) {
-                    if (prospectResponse === 'Request to Return later') {
-                        prospectResponse = 'Request to Return later: worth returning (AI powered feature)';
-                    } else if (prospectResponse === 'No answer') {
-                        prospectResponse = 'No answer: worth returning (AI powered feature)';
-                    }
+        if (!currentValue) {
+            clearButton.classList.remove("visible");
+        }
+
+        // Show clearButton when there is a text
+        clearButton.classList.add("visible");
+
+        // Skip empty or short address strings
+        if (!currentValue || currentValue.length < MIN_ADDRESS_LENGTH) {
+            return false;
+        }
+
+        /* Call the Address Autocomplete API with a delay */
+        currentTimeout = setTimeout(() => {
+            currentTimeout = null;
+
+            /* Create a new promise and send geocoding request */
+            const promise = new Promise((resolve, reject) => {
+                currentPromiseReject = reject;
+
+                const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(currentValue)}&format=json&limit=5&apiKey=${apiKey}`;
+
+                fetch(url)
+                    .then(response => {
+                        currentPromiseReject = null;
+
+                        // check if the call was successful
+                        if (response.ok) {
+                            response.json().then(data => resolve(data));
+                        } else {
+                            response.json().then(data => reject(data));
+                        }
+                    });
+            });
+
+            promise.then((data) => {
+                // here we get address suggestions
+                currentItems = data.results;
+
+                /*create a DIV element that will contain the items (values):*/
+                const autocompleteItemsElement = document.createElement("div");
+                autocompleteItemsElement.setAttribute("class", "autocomplete-items");
+                inputContainerElement.appendChild(autocompleteItemsElement);
+
+                /* For each item in the results */
+                data.results.forEach((result, index) => {
+                    /* Create a DIV element for each element: */
+                    const itemElement = document.createElement("div");
+                    /* Set formatted address as item value */
+                    itemElement.innerHTML = result.formatted;
+                    autocompleteItemsElement.appendChild(itemElement);
+
+                    /* Set the value for the autocomplete text field and notify: */
+                    itemElement.addEventListener("click", function(e) {
+                        inputElement.value = currentItems[index].formatted;
+                        callback(currentItems[index]);
+                        /* Close the list of autocompleted values: */
+                        closeDropDownList();
+                    });
+                });
+
+            }, (err) => {
+                if (!err.canceled) {
+                    console.log(err);
                 }
+            });
+        }, DEBOUNCE_DELAY);
+    });
 
-                const marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location,
-                    icon: getMarkerIcon(prospectResponse, isWorthReturning)
-                });
+    /* Add support for keyboard navigation */
+    inputElement.addEventListener("keydown", function(e) {
+        var autocompleteItemsElement = containerElement.querySelector(".autocomplete-items");
+        if (autocompleteItemsElement) {
+            var itemElements = autocompleteItemsElement.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                e.preventDefault();
+                /*If the arrow DOWN key is pressed, increase the focusedItemIndex variable:*/
+                focusedItemIndex = focusedItemIndex !== itemElements.length - 1 ? focusedItemIndex + 1 : 0;
+                /*and and make the current item more visible:*/
+                setActive(itemElements, focusedItemIndex);
+            } else if (e.keyCode == 38) {
+                e.preventDefault();
 
-                marker.response = prospectResponse;
-
-                const infoWindow = new google.maps.InfoWindow({
-                    content: createInfoWindowContent(item)
-                });
-
-                marker.addListener('click', function() {
-                    infoWindow.open(map, marker);
-                });
-
-                markers.push(marker);
-            } else {
-                console.error('Geocode was not successful for the following reason: ' + status);
+                /*If the arrow UP key is pressed, decrease the focusedItemIndex variable:*/
+                focusedItemIndex = focusedItemIndex !== 0 ? focusedItemIndex - 1 : focusedItemIndex = (itemElements.length - 1);
+                /*and and make the current item more visible:*/
+                setActive(itemElements, focusedItemIndex);
+            } else if (e.keyCode == 13) {
+                /* If the ENTER key is pressed and value as selected, close the list*/
+                e.preventDefault();
+                if (focusedItemIndex > -1) {
+                    closeDropDownList();
+                }
             }
-        });
+        } else {
+            if (e.keyCode == 40) {
+                /* Open dropdown list again */
+                var event = document.createEvent('Event');
+                event.initEvent('input', true, true);
+                inputElement.dispatchEvent(event);
+            }
+        }
+    });
+
+    function setActive(items, index) {
+        if (!items || !items.length) return false;
+
+        for (var i = 0; i < items.length; i++) {
+            items[i].classList.remove("autocomplete-active");
+        }
+
+        /* Add class "autocomplete-active" to the active element*/
+        items[index].classList.add("autocomplete-active");
+
+        // Change input value and notify
+        inputElement.value = currentItems[index].formatted;
+        callback(currentItems[index]);
+    }
+
+    function closeDropDownList() {
+        const autocompleteItemsElement = inputContainerElement.querySelector(".autocomplete-items");
+        if (autocompleteItemsElement) {
+            inputContainerElement.removeChild(autocompleteItemsElement);
+        }
+
+        focusedItemIndex = -1;
+    }
+
+    function addIcon(buttonElement) {
+        const svgElement = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
+        svgElement.setAttribute('viewBox', "0 0 24 24");
+        svgElement.setAttribute('height', "24");
+
+        const iconElement = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+        iconElement.setAttribute("d", "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z");
+        iconElement.setAttribute('fill', 'currentColor');
+        svgElement.appendChild(iconElement);
+        buttonElement.appendChild(svgElement);
+    }
+
+    /* Close the autocomplete dropdown when the document is clicked. 
+      Skip, when a user clicks on the input field */
+    document.addEventListener("click", function(e) {
+        if (e.target !== inputElement) {
+            closeDropDownList();
+        } else if (!containerElement.querySelector(".autocomplete-items")) {
+            // open dropdown list again
+            var event = document.createEvent('Event');
+            event.initEvent('input', true, true);
+            inputElement.dispatchEvent(event);
+        }
     });
 }
 
-function getMarkerIcon(prospectResponse, isWorthReturning) {
-    const color = colorMap[prospectResponse];
-    const size = 20;
-    const halfSize = size / 2;
-    
-    let svgPath = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="${halfSize}" cy="${halfSize}" r="${halfSize - 1}" fill="${color}" stroke="black" stroke-width="1"/>`;
-    
-    if (isWorthReturning) {
-        svgPath += `<line x1="${halfSize - 4}" y1="${halfSize}" x2="${halfSize + 4}" y2="${halfSize}" stroke="green" stroke-width="2"/>
-                    <line x1="${halfSize}" y1="${halfSize - 4}" x2="${halfSize}" y2="${halfSize + 4}" stroke="green" stroke-width="2"/>`;
-    }
-    
-    svgPath += '</svg>';
-
-    return {
-        url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svgPath),
-        scaledSize: new google.maps.Size(size, size),
-        origin: new google.maps.Point(0, 0),
-        anchor: new google.maps.Point(halfSize, halfSize)
-    };
-}
-
-function createInfoWindowContent(item) {
-    let content = '<div style="max-width: 300px; word-wrap: break-word;">';
-    for (const [key, value] of Object.entries(item)) {
-        content += `<p><strong>${key}:</strong> ${value}</p>`;
-    }
-    content += '</div>';
-    return content;
-}
-
-// Address autocomplete function in the Data Collection page
 function initAutocomplete() {
-    const input = document.getElementById('address');
-    if (!input) return; // Exit if the address input doesn't exist on the page
-
-    const options = {
-        types: ['address'],
-        //componentRestrictions: { country: 'au' }, // Restrict to Australia
-        fields: ['formatted_address', 'geometry']
-    };
-
-    const autocomplete = new google.maps.places.Autocomplete(input, options);
-
-    autocomplete.addListener('place_changed', function() {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) {
-            console.log("No details available for input: '" + place.name + "'");
-            return;
+    addressAutocomplete(document.getElementById("autocomplete-container"), (data) => {
+        if (data) {
+            document.getElementById('latitude').value = data.lat;
+            document.getElementById('longitude').value = data.lon;
         }
-
-        // You can access the selected place's details here
-        const address = place.formatted_address;
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-
-        console.log('Selected address:', address);
-        console.log('Latitude:', lat);
-        console.log('Longitude:', lng);
-
-        if (window.map) {
-            window.map.setCenter(place.geometry.location);
-            window.map.setZoom(15);
-        }
-
+    }, {
+        placeholder: "Enter an address here"
     });
 }
 
-function loadGoogleMapsScript() {
-    if (window.google && window.google.maps) {
-        // Google Maps API is already loaded
-        initGoogleMapsFeatures();
-    } else {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMapsFeatures`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-    }
-}
-
-function initGoogleMapsFeatures() {
-    console.log("Initializing Google Maps features");
-    if (document.getElementById('map')) {
-        console.log("Initializing map");
-        initMap();
-    }
-    if (document.getElementById('address')) {
-        console.log("Initializing autocomplete");
-        initAutocomplete();
-    }
-}
-
-document.addEventListener('DOMContentLoaded', loadGoogleMapsScript);
+document.addEventListener('DOMContentLoaded', initAutocomplete);
