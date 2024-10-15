@@ -11,6 +11,12 @@
     <script src="{{ url_for('static', filename='config.js') }}"></script>
     <script src="{{ url_for('static', filename='maps.js') }}"></script>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet-control-custom@1.0.0/Leaflet.Control.Custom.js"></script>
 </head>
 <!-- Navbar -->
 <nav id="navbar">
@@ -43,10 +49,9 @@
         <h2>Today's performance</h2>
         <div class="date-selector">
             <label for="date-select">Select Date:</label>
-            <input type="date" id="date-select" value="{{ selected_date }}">
+            <input type="date" id="date-select">
         </div>
-        <!-- TODO: update the dates here indicated for the new dataset -->
-        <p class="data-tip"><strong>Tip:</strong> The data of the pre-populated dataset created for the demo go from the 28th of August 2024 to the 28th of September 2024, weekends included.
+        <p class="data-tip"><strong>Tip:</strong> The data of the pre-populated dataset created for the demo go from the 7th of September 2024 to the 7th of October 2024, weekends included.
             Select a date in this range to visualize the related data.</p>
     
         <div class="performance-grid">
@@ -78,7 +83,7 @@
 
         <h2>Prospects' map</h2>
         <p class="data-tip"><strong>Tip:</strong> Customize your map view by toggling elements on or off using the Legend icons, and click on individual map markers to reveal detailed information about each data point.</p>
-        <div id="map" style="height: 500px; width: 100%;"></div>
+        <div id="map"></div>
 
          <h2>Suggested route</h2> <!--TODO: complete this part -->
          <p class="data-tip"><strong>Potential future updates:</strong> This section will present an optimized route suggestion, balancing high-priority targets (such as addresses with the highest predicted conversion rates from the ad-hoc developed ML model and previously unvisited houses) with efficient travel time between locations.</p>

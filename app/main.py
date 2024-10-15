@@ -219,7 +219,7 @@ def sync_data():
         return jsonify({"error": str(e)}), 500
 
 # Routes for Map related features
-@app.route('/get_all_map_data')
+@app.route('/get_map_data')
 def get_all_map_data():
     data = get_map_data()
     return jsonify(data)

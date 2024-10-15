@@ -61,16 +61,25 @@ def load_data():
     data = list(collection.find().sort('_id', -1))
     return data
 
+def get_last_available_date_for_user(role, nickname):
+    user_data = collection.find({'Submitted by': f'{role} {nickname}'}).sort('timestamp', -1).limit(1)
+    user_count = collection.count_documents({'Submitted by': f'{role} {nickname}'})
+    if user_count > 0:
+        return user_data[0]['timestamp'].date().isoformat()
+    return datetime.now().date().isoformat()
+
 # Function to load data for the maps
 def get_map_data():
     data = load_data()
     # Convert ObjectId and datetime objects to strings
     for item in data:
         item['_id'] = str(item['_id'])
+        # for key, value in item.items():
+        #     if isinstance(value, datetime):
+        #         item[key] = value.isoformat()
         item['timestamp'] = str(item['timestamp'])
         item['appointment_time'] = str(item['appointment_time'])
         item['follow_up_time'] = str(item['follow_up_time'])
-        # Ensure ML model prediction fields are included
         item['ML_model_pred_prob_of_app'] = item.get('ML_model_pred_prob_of_app', 'n/a')
         item['ML_model_pred_worth_returning'] = item.get('ML_model_pred_worth_returning', 'n/a')
     

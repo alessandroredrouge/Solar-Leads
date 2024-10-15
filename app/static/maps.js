@@ -1,4 +1,164 @@
 const apiKey = config.geoapifyApiKey;
+let map;
+let markers = [];
+let markerCluster;
+let visibleResponses = new Set();
+let legendVisible = true;
+
+const colorMap = {
+    'Appointment set': '%23008000',
+    'Positive conversation (Detailed)': '%23add8e6',
+    'Positive conversation (Initial)': '%230000ff',
+    'Request to Return later': '%23ffff00',
+    'Not interested (Homeowner)': '%23ff0000',
+    'Not interested (Renter)': '%23ffa500',
+    'No answer': '%23808080',
+    'Undefined': '%23ffffff'
+};
+
+function initMap() {
+    map = L.map('map').setView([-28.0167, 153.4000], 11);
+
+    const isRetina = L.Browser.retina;
+    const baseUrl = `https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}.png?apiKey=${apiKey}`;
+    const retinaUrl = `https://maps.geoapify.com/v1/tile/osm-bright/{z}/{x}/{y}@2x.png?apiKey=${apiKey}`;
+
+    L.tileLayer(isRetina ? retinaUrl : baseUrl, {
+        attribution: 'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | © OpenStreetMap <a href="https://www.openstreetmap.org/copyright" target="_blank">contributors</a>',
+        maxZoom: 20,
+        id: 'osm-bright',
+        useCache: true,
+        crossOrigin: true
+    }).addTo(map);
+
+    markerCluster = L.markerClusterGroup();
+    map.addLayer(markerCluster);
+
+    // Add custom legend control
+    legendControl = L.control({position: 'bottomleft'});
+    legendControl.onAdd = function (map) {
+        let div = L.DomUtil.create('div', 'info legend');
+        div.innerHTML = '<h4>Prospect Response</h4>';
+        div.id = 'map-legend';
+        return div;
+    };
+    legendControl.addTo(map);
+
+    // Add legend toggle button
+    L.control.custom({
+        position: 'topright',
+        content: '<button onclick="toggleLegend()">Toggle Legend</button>',
+        classes: 'legend-toggle-btn',
+    }).addTo(map);
+    createLegend();
+    fetchMapData();
+}
+
+function fetchMapData() {
+    fetch('/get_map_data')
+        .then(response => response.json())
+        .then(data => {
+            createMarkers(data);
+            createLegend();
+        })
+        .catch(error => console.error('Error fetching map data:', error));
+}
+
+function createMarkers(data) {
+    data.forEach(item => {
+        const lat = parseFloat(item.latitude);
+        const lng = parseFloat(item.longitude);
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+            const markerColor = getMarkerColor(item.prospect_response);
+            const markerInnerImage = getMarkerInnerImage(item.ML_model_pred_worth_returning);
+            const markerIcon = L.icon({
+                iconUrl: `https://api.geoapify.com/v1/icon?size=xx-large&type=awesome&color=${markerColor}&icon=${markerInnerImage}&apiKey=${apiKey}`,
+                iconSize: [31, 46],
+                iconAnchor: [15.5, 42],
+                popupAnchor: [0, -45]
+            });
+
+            const marker = L.marker([lat, lng], {icon: markerIcon}).bindPopup(() => createPopupContent(item));
+            markers.push({marker: marker, response: item.prospect_response});
+            markerCluster.addLayer(marker);
+        }
+    });
+    map.addLayer(markerCluster);
+}
+
+function getMarkerColor(response) {
+    return colorMap[response] || colorMap['Undefined'];
+}
+
+function getMarkerInnerImage(worthReturning) {
+    if (worthReturning === "Yes") {
+        return 'robot';
+    }
+    return 'sun';
+}
+
+function createPopupContent(item) {
+    let content = '<div class="popup-content">';
+    for (const [key, value] of Object.entries(item)) {
+        if (key !== '_id' && value !== null && value !== undefined) {
+            content += `<strong>${formatKey(key)}:</strong> ${formatValue(value)}<br>`;
+        }
+    }
+    content += '</div>';
+    return content;
+}
+
+function createLegend() {
+    const legend = document.getElementById('map-legend');
+    Object.entries(colorMap).forEach(([key, color]) => {
+        const row = document.createElement('div');
+        row.className = 'legend-item';
+        const markerIcon = L.icon({
+            iconUrl: `<img src="https://api.geoapify.com/v1/icon?size=xx-large&type=awesome&color=${color}&icon=sun&apiKey=${apiKey}"`,
+            iconSize: [31, 46],
+            iconAnchor: [15.5, 42],
+            popupAnchor: [0, -45]
+        });
+        row.innerHTML = `
+            ${markerIcon}
+            <span>${key}</span>
+            <input type="checkbox" checked onchange="toggleMarkers('${key}')">
+        `;
+        legend.appendChild(row);
+    });
+}
+
+function toggleLegend() {
+    const legend = document.getElementById('map-legend');
+    legend.style.display = legend.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleMarkers(response) {
+    if (visibleResponses.has(response)) {
+        visibleResponses.delete(response);
+    } else {
+        visibleResponses.add(response);
+    }
+
+    markerCluster.clearLayers();
+    markers.forEach(({marker, response: markerResponse}) => {
+        if (visibleResponses.has(markerResponse)) {
+            markerCluster.addLayer(marker);
+        }
+    });
+}
+
+function formatKey(key) {
+    return key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+function formatValue(value) {
+    if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'No';
+    }
+    return value;
+}
 
 function addressAutocomplete(containerElement, callback, options) {
     const MIN_ADDRESS_LENGTH = 3;
@@ -220,4 +380,7 @@ function initAutocomplete() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', initAutocomplete);
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    // initAutocomplete();
+});
