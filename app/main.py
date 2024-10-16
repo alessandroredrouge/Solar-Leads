@@ -201,6 +201,7 @@ def get_reasons_of_no_data():
     data = get_reasons_of_no()
     return jsonify(data)
 
+#FIXME: this function is not working, it always returns the current date instead of the date with the last available data for the user
 @app.route('/get_last_available_date', methods=['GET'])
 def get_last_available_date():
     role = session.get('role')

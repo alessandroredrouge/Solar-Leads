@@ -180,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     const dateSelect = document.getElementById('date-select');
+    dateSelect.value = '2024-10-06';
     const syncStatus = document.getElementById('sync-status');
 
     // FIXME: make this sync work properly
@@ -256,7 +257,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (rank % 10 === 3 && rank % 100 !== 13) return 'rd';
         return 'th';
     }
-    
+
+    updatePerformanceData(dateSelect.value);
     dateSelect.addEventListener('change', function() {
         updatePerformanceData(this.value);
     });
@@ -269,6 +271,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial sync when page loads
     syncData();
 });
+
+// FIXME: change it in a way that it sets the last available date in the date selector in field_support.html
+// Functionality to set the last available date in the date selector in field_support.html
+// document.addEventListener('DOMContentLoaded', function() {
+//     const dateSelect = document.getElementById('date-select');
+    
+//     // Fetch the last available date
+//     fetch('/get_last_available_date')
+//         .then(response => response.json())
+//         .then(data => {
+//             dateSelect.value = data.last_date;
+//             updatePerformanceData(data.last_date);
+//         })
+//         .catch(error => {
+//             console.error('Error:', error);
+//             dateSelect.value = new Date().toISOString().split('T')[0];
+//         });
+//     // Event listener for date change
+//     updatePerformanceData(this.value);
+//     dateSelect.addEventListener('change', function() {
+//         updatePerformanceData(this.value);
+//     });
+
+// });
 
 // Pitch recap functionality
 document.addEventListener('DOMContentLoaded', function() {

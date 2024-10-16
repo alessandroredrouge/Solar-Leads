@@ -61,7 +61,8 @@ def load_data():
     data = list(collection.find().sort('_id', -1))
     return data
 
-def get_last_available_date_for_user(role, nickname):
+#FIXME: this function is not working, it always returns the current date instead of the date with the last available data for the user
+def get_last_available_date_for_user(role, nickname): 
     user_data = collection.find({'Submitted by': f'{role} {nickname}'}).sort('timestamp', -1).limit(1)
     user_count = collection.count_documents({'Submitted by': f'{role} {nickname}'})
     if user_count > 0:
