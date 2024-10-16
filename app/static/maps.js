@@ -73,6 +73,7 @@ function createMarkers(data) {
         if (!isNaN(lat) && !isNaN(lng)) {
             const markerColor = getMarkerColor(item.prospect_response);
             const markerInnerImage = getMarkerInnerImage(item.ML_model_pred_worth_returning);
+            const markerResponse = getMarkerResponse(item.prospect_response, item.ML_model_pred_worth_returning);
             const markerIcon = L.icon({
                 iconUrl: `https://api.geoapify.com/v1/icon?size=xx-large&type=awesome&color=${markerColor}&icon=${markerInnerImage}&apiKey=${apiKey}`,
                 iconSize: [31, 46],
@@ -81,7 +82,7 @@ function createMarkers(data) {
             });
 
             const marker = L.marker([lat, lng], {icon: markerIcon}).bindPopup(() => createPopupContent(item));
-            markers.push({marker: marker, response: item.prospect_response});
+            markers.push({marker: marker, response: markerResponse});
             markerCluster.addLayer(marker);
         }
     });
@@ -97,6 +98,18 @@ function getMarkerInnerImage(worthReturning) {
         return 'robot';
     }
     return 'sun';
+}
+
+function getMarkerResponse(response, worthReturning) {
+    if (response === 'No answer') {
+        return worthReturning === 'Yes' ? 'No answer - worth returning (AI powered feature)' : 'No answer';
+    }
+    else if (response === 'Request to Return later') {
+        return worthReturning === 'Yes' ? 'Request to Return later - worth returning (AI powered feature)' : 'Request to Return later';
+    }
+    else {
+        return response;
+    }
 }
 
 function createPopupContent(item) {
@@ -163,6 +176,7 @@ function createLegend() {
         `;
         legend.appendChild(row);
     });
+    initVisibleResponses();
 }
 
 function toggleLegend() {
@@ -171,11 +185,15 @@ function toggleLegend() {
 }
 
 function toggleMarkers(response) {
-    if (visibleResponses.has(response)) {
-        visibleResponses.delete(response);
-    } else {
-        visibleResponses.add(response);
-    }
+    let responsesToToggle = [response];
+
+    responsesToToggle.forEach(resp => {
+        if (visibleResponses.has(resp)) {
+            visibleResponses.delete(resp);
+        } else {
+            visibleResponses.add(resp);
+        }
+    });
 
     markerCluster.clearLayers();
     markers.forEach(({marker, response: markerResponse}) => {
@@ -183,6 +201,18 @@ function toggleMarkers(response) {
             markerCluster.addLayer(marker);
         }
     });
+
+    // Update checkbox state for all affected responses
+    responsesToToggle.forEach(resp => {
+        const checkbox = document.querySelector(`input[type="checkbox"][onchange="toggleMarkers('${resp}')"]`);
+        if (checkbox) {
+            checkbox.checked = visibleResponses.has(resp);
+        }
+    });
+}
+
+function initVisibleResponses() {
+    visibleResponses = new Set(Object.keys(colorMap));
 }
 
 function formatKey(key) {
@@ -419,4 +449,5 @@ function initAutocomplete() {
 document.addEventListener('DOMContentLoaded', () => {
     initMap();
     // initAutocomplete();
+    initVisibleResponses();
 });
