@@ -488,7 +488,10 @@ function addressAutocomplete(containerElement, callback, options) {
 }
 
 function initAutocomplete() {
-    addressAutocomplete(document.getElementById("autocomplete-container"), (data) => {
+    const container = document.getElementById("autocomplete-container");
+    const input = container.querySelector("#address");
+    
+    addressAutocomplete(container, (data) => {
         if (data) {
             document.getElementById('latitude').value = data.lat;
             document.getElementById('longitude').value = data.lon;
@@ -499,7 +502,12 @@ function initAutocomplete() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    initMap();
-    // initAutocomplete();
-    initVisibleResponses();
+    if (document.getElementById('map')) {
+        initMap();
+        initVisibleResponses();
+    }
+    
+    if (document.getElementById('autocomplete-container')) {
+        initAutocomplete();
+    }
 });
