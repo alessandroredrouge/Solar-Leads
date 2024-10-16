@@ -9,9 +9,11 @@ const colorMap = {
     'Appointment set': '%23008000',
     'Positive conversation (Detailed)': '%23add8e6',
     'Positive conversation (Initial)': '%230000ff',
-    'Request to Return later': '%23ffff00',
+    'Request to Return later - worth returning (AI powered feature)': '%23FFD700',
+    'Request to Return later': '%23FFD700',
     'Not interested (Homeowner)': '%23ff0000',
     'Not interested (Renter)': '%23ffa500',
+    'No answer - worth returning (AI powered feature)': '%23808080',
     'No answer': '%23808080',
     'Undefined': '%23ffffff'
 };
@@ -50,7 +52,6 @@ function initMap() {
         content: '<button onclick="toggleLegend()">Toggle Legend</button>',
         classes: 'legend-toggle-btn',
     }).addTo(map);
-    createLegend();
     fetchMapData();
 }
 
@@ -109,19 +110,54 @@ function createPopupContent(item) {
     return content;
 }
 
+const aiPoweredResponses = [
+    'Request to Return later - worth returning (AI powered feature)',
+    'No answer - worth returning (AI powered feature)'
+];
+
 function createLegend() {
     const legend = document.getElementById('map-legend');
+    legend.innerHTML = '<h4>Prospect Response</h4>'; // Clear existing content
+
     Object.entries(colorMap).forEach(([key, color]) => {
         const row = document.createElement('div');
         row.className = 'legend-item';
-        const markerIcon = L.icon({
-            iconUrl: `<img src="https://api.geoapify.com/v1/icon?size=xx-large&type=awesome&color=${color}&icon=sun&apiKey=${apiKey}"`,
-            iconSize: [31, 46],
-            iconAnchor: [15.5, 42],
-            popupAnchor: [0, -45]
-        });
-        row.innerHTML = `
-            ${markerIcon}
+        
+        // Create SVG marker
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute('width', '24');
+        svg.setAttribute('height', '36');
+        svg.setAttribute('viewBox', '0 0 24 36');
+        
+        // Create pin shape
+        const pin = document.createElementNS(svgNS, "path");
+        pin.setAttribute('d', 'M12 0C5.4 0 0 5.4 0 12c0 7.2 12 24 12 24s12-16.8 12-24c0-6.6-5.4-12-12-12z');
+        pin.setAttribute('fill', `#${color.substring(3)}`);
+        pin.setAttribute('stroke', '#000');
+        pin.setAttribute('stroke-width', '1');
+        
+        // Create white circle
+        const circle = document.createElementNS(svgNS, "circle");
+        circle.setAttribute('cx', '12');
+        circle.setAttribute('cy', '12');
+        circle.setAttribute('r', '9');
+        circle.setAttribute('fill', '#FFFFFF');
+        
+        // Create icon (sun or robot)
+        const icon = document.createElementNS(svgNS, "use");
+        icon.setAttribute('href', aiPoweredResponses.includes(key) ? '#robot-icon' : '#sun-icon');
+        icon.setAttribute('width', '12');
+        icon.setAttribute('height', '12');
+        icon.setAttribute('x', '6');
+        icon.setAttribute('y', '6');
+        
+        svg.appendChild(pin);
+        svg.appendChild(circle);
+        svg.appendChild(icon);
+        
+        row.appendChild(svg);
+        row.innerHTML += `
             <span>${key}</span>
             <input type="checkbox" checked onchange="toggleMarkers('${key}')">
         `;
