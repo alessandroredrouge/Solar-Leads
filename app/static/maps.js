@@ -4,6 +4,7 @@ let markers = [];
 let markerCluster;
 let visibleResponses = new Set();
 let legendVisible = true;
+let clusteringEnabled = true;
 
 const colorMap = {
     'Appointment set': '%23008000',
@@ -52,6 +53,14 @@ function initMap() {
         content: '<button onclick="toggleLegend()">Toggle Legend</button>',
         classes: 'legend-toggle-btn',
     }).addTo(map);
+
+    // Add clustering toggle button
+    L.control.custom({
+        position: 'topright',
+        content: '<button onclick="toggleClustering()" id="clustering-toggle">Disable Clustering</button>',
+        classes: 'clustering-toggle-btn',
+    }).addTo(map);
+
     fetchMapData();
 }
 
@@ -184,6 +193,36 @@ function toggleLegend() {
     legend.style.display = legend.style.display === 'none' ? 'block' : 'none';
 }
 
+function toggleClustering() {
+    clusteringEnabled = !clusteringEnabled;
+    
+    if (clusteringEnabled) {
+        // Enable clustering
+        markers.forEach(({marker}) => {
+            map.removeLayer(marker); // Remove all individual markers from the map
+        });
+        markerCluster.clearLayers();
+        markers.forEach(({marker, response}) => {
+            if (visibleResponses.has(response)) {
+                markerCluster.addLayer(marker);
+            }
+        });
+        map.addLayer(markerCluster);
+    } else {
+        // Disable clustering
+        map.removeLayer(markerCluster);
+        markers.forEach(({marker, response}) => {
+            if (visibleResponses.has(response)) {
+                map.addLayer(marker);
+            }
+        });
+    }
+    
+    // Update button text
+    const button = document.getElementById('clustering-toggle');
+    button.textContent = clusteringEnabled ? 'Disable Clustering' : 'Enable Clustering';
+}
+
 function toggleMarkers(response) {
     let responsesToToggle = [response];
 
@@ -195,12 +234,25 @@ function toggleMarkers(response) {
         }
     });
 
-    markerCluster.clearLayers();
-    markers.forEach(({marker, response: markerResponse}) => {
-        if (visibleResponses.has(markerResponse)) {
-            markerCluster.addLayer(marker);
-        }
-    });
+    if (clusteringEnabled) {
+        markers.forEach(({marker}) => {
+            map.removeLayer(marker); // Remove all individual markers
+        });
+        markerCluster.clearLayers();
+        markers.forEach(({marker, response: markerResponse}) => {
+            if (visibleResponses.has(markerResponse)) {
+                markerCluster.addLayer(marker);
+            }
+        });
+    } else {
+        markers.forEach(({marker, response: markerResponse}) => {
+            if (visibleResponses.has(markerResponse)) {
+                map.addLayer(marker);
+            } else {
+                map.removeLayer(marker);
+            }
+        });
+    }
 
     // Update checkbox state for all affected responses
     responsesToToggle.forEach(resp => {
