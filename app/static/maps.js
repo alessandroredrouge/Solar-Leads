@@ -65,12 +65,22 @@ function initMap() {
     // Add address search control
     L.control.custom({
         position: 'topright',
-        content: '<div id="autocomplete-container" class="geocoder-container">' +
-                 '<input type="text" id="address" placeholder="Enter an address">' +
-                 '<input type="hidden" id="latitude">' +
-                 '<input type="hidden" id="longitude">' +
-                 '</div>',
-        classes: 'address-search-control',
+        content: `
+            <div id="autocomplete-container" class="geocoder-container" style="margin-left: 50px;">
+                <input type="text" id="address" placeholder="Enter an address here" style="
+                    width: 400px;
+                    padding: 5px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    height: 30px;
+                    margin-bottom: 10px;
+                ">
+                <input type="hidden" id="latitude">
+                <input type="hidden" id="longitude">
+            </div>
+        `,
+        classes: 'address-search-control'
     }).addTo(map);
 
     initAutocomplete();
