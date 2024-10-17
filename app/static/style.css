@@ -553,3 +553,12 @@ tbody tr:hover {
 .page-input input[type="number"] {
     width: 80px;
 }
+
+#autocomplete-container input[type="text"] {
+    width: 400px; /* Adjust this value to make the bar longer */
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+

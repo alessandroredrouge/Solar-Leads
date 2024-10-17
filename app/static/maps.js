@@ -5,6 +5,7 @@ let markerCluster;
 let visibleResponses = new Set();
 let legendVisible = true;
 let clusteringEnabled = true;
+let tempMarker;
 
 const colorMap = {
     'Appointment set': '%23008000',
@@ -49,17 +50,30 @@ function initMap() {
 
     // Add legend toggle button
     L.control.custom({
-        position: 'topright',
+        position: 'bottomright',
         content: '<button onclick="toggleLegend()">Toggle Legend</button>',
         classes: 'legend-toggle-btn',
     }).addTo(map);
 
     // Add clustering toggle button
     L.control.custom({
-        position: 'topright',
+        position: 'bottomright',
         content: '<button onclick="toggleClustering()" id="clustering-toggle">Disable Clustering</button>',
         classes: 'clustering-toggle-btn',
     }).addTo(map);
+
+    // Add address search control
+    L.control.custom({
+        position: 'topright',
+        content: '<div id="autocomplete-container" class="geocoder-container">' +
+                 '<input type="text" id="address" placeholder="Enter an address">' +
+                 '<input type="hidden" id="latitude">' +
+                 '<input type="hidden" id="longitude">' +
+                 '</div>',
+        classes: 'address-search-control',
+    }).addTo(map);
+
+    initAutocomplete();
 
     fetchMapData();
 }
@@ -280,9 +294,9 @@ function formatValue(value) {
 
 function addressAutocomplete(containerElement, callback, options) {
     const MIN_ADDRESS_LENGTH = 3;
-    const DEBOUNCE_DELAY = 300;
+    const DEBOUNCE_DELAY = 100;
 
-    // Use the existing input element
+    // Find the input element within the container
     const inputElement = containerElement.querySelector("#address");
     const inputContainerElement = containerElement;
 
@@ -299,6 +313,10 @@ function addressAutocomplete(containerElement, callback, options) {
         callback(null);
         clearButton.classList.remove("visible");
         closeDropDownList();
+        if (tempMarker) {
+            map.removeLayer(tempMarker);
+            tempMarker = null;
+        }
     });
     inputContainerElement.appendChild(clearButton);
 
@@ -391,6 +409,16 @@ function addressAutocomplete(containerElement, callback, options) {
                         callback(currentItems[index]);
                         /* Close the list of autocompleted values: */
                         closeDropDownList();
+
+                        // Center map on selected location and add temporary marker
+                        const lat = currentItems[index].lat;
+                        const lon = currentItems[index].lon;
+                        map.setView([lat, lon], 15);
+
+                        if (tempMarker) {
+                            map.removeLayer(tempMarker);
+                        }
+                        tempMarker = L.marker([lat, lon]).addTo(map);
                     });
                 });
 
@@ -489,9 +517,9 @@ function addressAutocomplete(containerElement, callback, options) {
 
 function initAutocomplete() {
     const container = document.getElementById("autocomplete-container");
-    const input = container.querySelector("#address");
     
     addressAutocomplete(container, (data) => {
+        console.log("Selected address:", data);
         if (data) {
             document.getElementById('latitude').value = data.lat;
             document.getElementById('longitude').value = data.lon;
@@ -506,8 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initMap();
         initVisibleResponses();
     }
-    
-    if (document.getElementById('autocomplete-container')) {
+    if (document.getElementById('address')) {
         initAutocomplete();
     }
 });
