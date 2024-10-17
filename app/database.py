@@ -61,6 +61,24 @@ def load_data():
     data = list(collection.find().sort('_id', -1))
     return data
 
+# Function to load data from the MongoDB database with pagination for the tables 
+def load_num_of_data(page=1, per_page=100):
+    # Calculate the number of documents to skip
+    skip = (page - 1) * per_page
+    # Retrieve paginated documents from the MongoDB collection
+    data = list(collection.find().sort('_id', -1).skip(skip).limit(per_page))
+    # Get the total count of documents
+    total_count = collection.count_documents({})
+    # Calculate total pages
+    total_pages = (total_count + per_page - 1) // per_page
+    return {
+        'data': data,
+        'total_pages': total_pages,
+        'current_page': page,
+        'per_page': per_page,
+        'total_count': total_count
+    }
+
 #FIXME: this function is not working, it always returns the current date instead of the date with the last available data for the user
 def get_last_available_date_for_user(role, nickname): 
     user_data = collection.find({'Submitted by': f'{role} {nickname}'}).sort('timestamp', -1).limit(1)

@@ -512,4 +512,44 @@ tbody tr:hover {
     color: #888;
 }
 
+/* Pagination */
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
 
+.pagination a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
+}
+
+.pagination span {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+}
+
+.page-input {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.page-input form {
+    display:  inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* Adjust the gap as needed */
+}
+
+.page-input input[type="number"] {
+    width: 80px;
+}

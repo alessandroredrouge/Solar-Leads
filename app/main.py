@@ -4,7 +4,7 @@
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
 from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction
-from database import save_data, delete_data, delete_ALL_data, load_data, get_map_data, get_last_available_date_for_user
+from database import save_data, delete_data, delete_ALL_data, load_data, load_num_of_data, get_map_data, get_last_available_date_for_user
 from datetime import datetime
 from ML_model import load_trained_model
 import os
@@ -56,10 +56,20 @@ def data_collection():
     nickname = session.get('nickname')
     if not role or role == 'Manager':
         return redirect(url_for('role_selection')) # only accessible for canvassers and team leaders
-    data = load_data()
+    page = request.args.get('page', 1, type=int)
+    per_page = 100  # Number of rows per page
+    result = load_num_of_data(page, per_page)
+    data = result['data']
     for item in data:
         item['_id'] = str(item['_id'])  # Change the MongoDB ID Object to a string to display it in the HTML
-    return render_template('data_collection.html', data=data, role=role, nickname=nickname)
+    return render_template('data_collection.html', 
+                           data=data, 
+                           role=role, 
+                           nickname=nickname,
+                           current_page=result['current_page'],
+                           per_page=per_page,
+                           total_pages=result['total_pages'],
+                           total_count=result['total_count'])
 
 @app.route('/field_support')
 def field_support():

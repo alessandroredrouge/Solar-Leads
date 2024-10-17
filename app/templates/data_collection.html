@@ -220,10 +220,32 @@
         
         <!-- Add the table to display MongoDB data -->
         <h2>Collected Data</h2>
-        {% set sample_count = data|length %}
-        <p style="text-align: center;">There {{ 'is' if sample_count == 1 else 'are' }} currently <strong>{{ sample_count }}</strong> data sample{{ '' if sample_count == 1 else 's' }} in the database.</p>
         <!-- Delete all button to delete all data from table -->
         <button class="delete-all-btn" id="delete-all-btn">Delete all</button>
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination">
+                {% if current_page > 1 %}
+                    <a href="{{ url_for('data_collection', page=current_page-1) }}">&laquo; Previous</a>
+                {% endif %}
+                
+                <span>Page {{ current_page }} of {{ total_pages }}</span>
+                
+                {% if current_page < total_pages %}
+                    <a href="{{ url_for('data_collection', page=current_page+1) }}">Next &raquo;</a>
+                {% endif %}
+            </div>
+            
+            <div class="page-input">
+                <form action="{{ url_for('data_collection') }}" method="get">
+                    <label for="page">Go to page:</label>
+                    <input type="number" id="page" name="page" min="1" max="{{ total_pages }}" value="{{ current_page }}">
+                    <button type="submit">Go</button>
+                </form>
+            </div>
+        </div>
+        
+        <p>Showing {{ (current_page - 1) * per_page + 1 }} - {{ [current_page * per_page, total_count] | min }} of {{ total_count }} records</p>
         <!-- Define the columns mapping to match the Table headers and the MongoDB keys-->
         {% set columns = [
             {'key': '_id', 'name': 'Prospect ID'},
