@@ -4,7 +4,7 @@
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
 from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction
-from database import save_data, delete_data, delete_ALL_data, load_data, load_num_of_data, get_map_data, get_last_available_date_for_user
+from database import save_data, delete_data, delete_ALL_data, load_data, load_num_of_data, load_ML_prediction_data, get_map_data, get_last_available_date_for_user
 from datetime import datetime
 from ML_model import load_trained_model
 import os
@@ -83,7 +83,22 @@ def field_support():
         return redirect(url_for('role_selection')) # only accessible for canvassers and team leaders
     selected_date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
     performance = get_one_day_performance(role, nickname, selected_date)
-    return render_template('field_support.html', role=role, nickname=nickname, performance=performance, selected_date=selected_date)
+    page = request.args.get('page', 1, type=int)
+    per_page = 20  # Number of rows per page
+    ml_prediction_data = load_ML_prediction_data(page, per_page)
+    for item in ml_prediction_data['data']:
+        item['_id'] = str(item['_id'])
+
+    return render_template('field_support.html', 
+                           role=role, 
+                           nickname=nickname, 
+                           performance=performance, 
+                           selected_date=selected_date,
+                           data=ml_prediction_data['data'],
+                           current_page=ml_prediction_data['current_page'],
+                           total_pages=ml_prediction_data['total_pages'],
+                           per_page=ml_prediction_data['per_page'],
+                           total_count=ml_prediction_data['total_count'])
 
 @app.route('/prospect_qualification')
 def prospect_qualification():

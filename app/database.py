@@ -61,7 +61,7 @@ def load_data():
     data = list(collection.find().sort('_id', -1))
     return data
 
-# Function to load data from the MongoDB database with pagination for the tables 
+# Functions to load data from the MongoDB database with pagination for the tables 
 def load_num_of_data(page=1, per_page=100):
     # Calculate the number of documents to skip
     skip = (page - 1) * per_page
@@ -70,6 +70,26 @@ def load_num_of_data(page=1, per_page=100):
     # Get the total count of documents
     total_count = collection.count_documents({})
     # Calculate total pages
+    total_pages = (total_count + per_page - 1) // per_page
+    return {
+        'data': data,
+        'total_pages': total_pages,
+        'current_page': page,
+        'per_page': per_page,
+        'total_count': total_count
+    }
+
+def load_ML_prediction_data(page=1, per_page=20, prospect_responses=['No answer', 'Request to Return later']):
+    skip = (page - 1) * per_page
+    query = {
+        'prospect_response': {'$in': prospect_responses},
+        'ML_model_pred_worth_returning': 'Yes'
+    }
+    data = list(collection.find(query)
+                .sort('ML_model_pred_prob_of_app', -1)
+                .skip(skip)
+                .limit(per_page))
+    total_count = collection.count_documents(query)
     total_pages = (total_count + per_page - 1) // per_page
     return {
         'data': data,

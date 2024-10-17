@@ -81,15 +81,98 @@
             </div>
         </div>
 
-        <h2>Prospects' map</h2>
+        <h2>Prospects' map (AI powered feature)</h2>
         <p class="data-tip"><strong>Tip:</strong> Customize your map view by toggling elements on or off using the Legend icons, and click on individual map markers to reveal detailed information about each data point.
             The map in 'disabled clustering' mode could take a while to load and be a bit slow due to the amount of data points displayed. It's suggested to use it only when zoomed in and/or when a few categories of data points are disabled.</p>
         <div id="map"></div>
 
          <h2>Suggested route</h2> <!--TODO: complete this part -->
          <p class="data-tip"><strong>Potential future updates:</strong> This section will present an optimized route suggestion, balancing high-priority targets (such as addresses with the highest predicted conversion rates from the ad-hoc developed ML model and previously unvisited houses) with efficient travel time between locations.</p>
+        
+         <h2>Addresses worth returning (AI powered feature)</h2>
+         <p class="data-tip"><strong>Tip:</strong> This table displays addresses of houses deemed worth revisiting, as determined by the ML model's predictions. These locations are identified as having a high probability of converting into successful sales.</p>
+        <!-- Pagination controls -->
+        <div class="pagination-container">
+            <div class="pagination">
+                {% if current_page > 1 %}
+                    <a href="{{ url_for('field_support', page=current_page-1) }}">&laquo; Previous</a>
+                {% endif %}
+                
+                <span>Page {{ current_page }} of {{ total_pages }}</span>
+                
+                {% if current_page < total_pages %}
+                    <a href="{{ url_for('field_support', page=current_page+1) }}">Next &raquo;</a>
+                {% endif %}
+            </div>
+            
+            <div class="page-input">
+                <form action="{{ url_for('field_support') }}" method="get">
+                    <label for="page">Go to page:</label>
+                    <input type="number" id="page" name="page" min="1" max="{{ total_pages }}" value="{{ current_page }}">
+                    <button type="submit">Go</button>
+                </form>
+            </div>
+        </div>
+        <p>Showing {{ (current_page - 1) * per_page + 1 }} - {{ [current_page * per_page, total_count] | min }} of {{ total_count }} records</p>
+        {% set columns = [
+            {'key': 'ML_model_pred_worth_returning', 'name': 'ML Model Prediction: Worth Returning'},
+            {'key': 'ML_model_pred_prob_of_app', 'name': 'ML Model Prediction: Probability of Appointment'},
+            {'key': '_id', 'name': 'Prospect ID'},
+            {'key': 'address', 'name': 'Address'},
+            {'key': 'latitude', 'name': 'Latitude'},
+            {'key': 'longitude', 'name': 'Longitude'},
+            {'key': 'timestamp', 'name': 'Time of Contact'},
+            {'key': 'prospect_response', 'name': 'Prospect Response'},
+            {'key': 'name_surname', 'name': 'Name and Surname'},
+            {'key': 'contact_email', 'name': 'Contact Email'},
+            {'key': 'contact_phone', 'name': 'Contact Phone Number'},
+            {'key': 'appointment_time', 'name': 'Appointment Time'},
+            {'key': 'follow_up_time', 'name': 'Follow-up Time'},
+            {'key': 'reason_of_no', 'name': "Reason of 'No'"},
+            {'key': 'solar_panels_on_roof', 'name': 'Solar Panels on Roof'},
+            {'key': 'roof_type_condition', 'name': 'Roof Type & Condition'},
+            {'key': 'shading_issues', 'name': 'Shading Issues'},
+            {'key': 'appliances', 'name': 'Appliances & House Characteristics'},
+            {'key': 'electricity_bill_estimate', 'name': 'Quarterly Electricity Bill Estimate (in $)'},
+            {'key': 'number_of_decision_makers', 'name': 'Number of Decision Makers'},
+            {'key': 'approximate_age', 'name': 'Approximate Age of Decision Maker(s)'},
+            {'key': 'number_inhabitants', 'name': 'Number of Inhabitants in the House'},
+            {'key': 'additional_notes', 'name': 'Additional Notes / Comments'},
+            {'key': 'Submitted by', 'name': 'Submitted by'}
+        ] %}
+        <div class="table-wrapper">
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th></th>
+                        {% for column in columns %}
+                            <th>{{ column.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody> 
+                    {% if data %}
+                        {% for row in data %}
+                            <tr>
+                                <td class="delete-cell-column">
+                                    <button class="delete-btn" data-id="{{ row['_id'] }}">X</button>
+                                </td>
+                                {% for column in columns %}
+                                    <td>{{ row.get(column.key, '') }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="{{ columns|length + 1 }}">No data available yet.</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+                
+            </table>
+        </div>
 
-        <h2>Pitch recap</h2>
+        <h2>Pitch recap</h2> <!--FIXME: the pitch can be modified but cannot be saved, being lost when the page is reloaded. Save it in MongoDB and associate it to the specific user -->
         <p class="data-tip"><strong>Tip:</strong> Customize the pitch to suit your needs and save your personalized version.</p>
         <div id="pitch-recap">
             <textarea id="pitch-box" readonly></textarea>
