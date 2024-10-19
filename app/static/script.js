@@ -333,6 +333,37 @@ Would this be something you're interested in?";
     }
 });
 
+// Function to populate the Prospect Personas table
+function populateProspectPersonas() {
+    fetch('/get_prospect_personas')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('best-solar-panels').textContent = data.best.solar_panels_on_roof;
+            document.getElementById('worst-solar-panels').textContent = data.worst.solar_panels_on_roof;
+            document.getElementById('best-roof-condition').textContent = data.best.roof_type_condition;
+            document.getElementById('worst-roof-condition').textContent = data.worst.roof_type_condition;
+            document.getElementById('best-shading-issues').textContent = data.best.shading_issues;
+            document.getElementById('worst-shading-issues').textContent = data.worst.shading_issues;
+            document.getElementById('best-appliances').textContent = data.best.appliances;
+            document.getElementById('worst-appliances').textContent = data.worst.appliances;
+            document.getElementById('best-electricity-bill').textContent = data.best.electricity_bill_estimate;
+            document.getElementById('worst-electricity-bill').textContent = data.worst.electricity_bill_estimate;
+            document.getElementById('best-decision-makers').textContent = data.best.number_of_decision_makers;
+            document.getElementById('worst-decision-makers').textContent = data.worst.number_of_decision_makers;
+            document.getElementById('best-age').textContent = data.best.approximate_age;
+            document.getElementById('worst-age').textContent = data.worst.approximate_age;
+            document.getElementById('best-inhabitants').textContent = data.best.number_inhabitants;
+            document.getElementById('worst-inhabitants').textContent = data.worst.number_inhabitants;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// Load components of the Prospect Qualification page
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('best-solar-panels')) {
+        populateProspectPersonas();
+    }
+});
 
 // Call this function when the analytics page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -536,3 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(error => console.error('Error fetching reasons of no data:', error));
     }
 });
+
+
+
+

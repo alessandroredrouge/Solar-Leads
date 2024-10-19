@@ -3,7 +3,7 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
-from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction
+from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction, get_prospect_personas
 from database import save_data, delete_data, delete_ALL_data, load_data, load_num_of_data, load_ML_prediction_data, get_map_data, get_last_available_date_for_user
 from datetime import datetime
 from ML_model import load_trained_model
@@ -197,6 +197,14 @@ def get_overall_performance_data():
         return jsonify({"error": "Not authenticated"}), 401
     overall_performance = get_overall_performance(role, nickname)
     return jsonify(overall_performance)
+
+@app.route('/get_prospect_personas')
+def get_prospect_personas_data():
+    role = session.get('role')
+    if not role or role == 'Canvasser':
+        return jsonify({"error": "Unauthorized"}), 403
+    personas = get_prospect_personas()
+    return jsonify(personas)
 
 @app.route('/get_team_overview', methods=['GET'])
 def get_team_overview_data():

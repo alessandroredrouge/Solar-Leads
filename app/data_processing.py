@@ -7,7 +7,8 @@ import pandas as pd
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from collections import defaultdict
+from collections import defaultdict, Counter
+from statistics import mean
 
 
 # Load environment variables from .env file
@@ -132,6 +133,60 @@ def get_overall_performance(role, nickname):
 
     return overall_performance
 
+# Functions for the Prospect Qualification webpage
+
+def get_prospect_personas():
+    all_data = list(collection.find())
+    
+    def get_normalized_data(field):
+        total_counts = Counter()
+        appointment_counts = Counter()
+        non_appointment_counts = Counter()
+        
+        for d in all_data:
+            if d['prospect_response'] not in ['No answer', 'Request to Return later']:
+                value = d.get(field)
+                if value is not None and value != '':
+                    total_counts[str(value)] += 1
+                    if d['prospect_response'] == 'Appointment set':
+                        appointment_counts[str(value)] += 1
+                    else:
+                        non_appointment_counts[str(value)] += 1
+        
+        normalized_data_best = {}
+        normalized_data_worst = {}
+        for option, total_count in total_counts.items():
+            appointment_count = appointment_counts.get(option, 0)
+            normalized_data_best[option] = appointment_count / total_count if total_count > 0 else 0
+            non_appointment_count = non_appointment_counts.get(option, 0)
+            normalized_data_worst[option] = non_appointment_count / total_count if total_count > 0 else 0
+        
+        return {'best': normalized_data_best, 'worst': normalized_data_worst}
+    
+    def get_best_worst(normalized_data):
+        sorted_data = sorted(normalized_data.items(), key=lambda x: x[1], reverse=True)
+        return sorted_data[0][0]
+    
+    fields = ['solar_panels_on_roof', 'roof_type_condition', 'shading_issues', 'appliances',
+              'number_of_decision_makers', 'approximate_age', 'number_inhabitants']
+    
+    best_persona = {}
+    worst_persona = {}
+    
+    for field in fields:
+        normalized_data = get_normalized_data(field)
+        best, worst = get_best_worst(normalized_data['best']), get_best_worst(normalized_data['worst'])
+        best_persona[field] = best
+        worst_persona[field] = worst
+    
+    # Handle electricity bill estimate separately
+    appointment_bills = [float(d['electricity_bill_estimate']) for d in all_data if d['prospect_response'] == 'Appointment set' and d['electricity_bill_estimate'] not in ['', 'n/a', None]]
+    non_appointment_bills = [float(d['electricity_bill_estimate']) for d in all_data if d['prospect_response'] not in ['Appointment set', 'No answer', 'Request to Return later'] and d['electricity_bill_estimate'] not in ['', 'n/a', None]]
+    
+    best_persona['electricity_bill_estimate'] = round(mean(appointment_bills), 2) if appointment_bills else 'n/a'
+    worst_persona['electricity_bill_estimate'] = round(mean(non_appointment_bills), 2) if non_appointment_bills else 'n/a'
+
+    return {'best': best_persona, 'worst': worst_persona}
 
 # Functions for the Analytics webpage
 
