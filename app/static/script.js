@@ -333,6 +333,7 @@ Would this be something you're interested in?";
     }
 });
 
+// Scripts for the Prospect Qualification page
 // Function to populate the Prospect Personas table
 function populateProspectPersonas() {
     fetch('/get_prospect_personas')
@@ -358,13 +359,131 @@ function populateProspectPersonas() {
         .catch(error => console.error('Error:', error));
 }
 
+let prospectsDataDistributionChart;
+
+function createProspectsDataDistributionChart(data) {
+    const ctx = document.getElementById('prospectsDataDistributionChart').getContext('2d');
+    const isNumerical = data.type === 'numerical';
+
+    if (prospectsDataDistributionChart) {
+        prospectsDataDistributionChart.destroy();
+    }
+
+    // Define the order of responses and their corresponding colors
+    const responseOrder = [
+        'Undefined',
+        'No answer',
+        'Not interested (Renter)',
+        'Not interested (Homeowner)',
+        'Request to Return later',
+        'Positive conversation (Initial)',
+        'Positive conversation (Detailed)',
+        'Appointment set'
+    ];
+
+    const colorMap = {
+        'Undefined': 'rgba(255, 255, 255, 0.6)',
+        'No answer': 'rgba(128, 128, 128, 0.6)',
+        'Not interested (Renter)': 'rgba(255, 165, 0, 0.6)',
+        'Not interested (Homeowner)': 'rgba(255, 0, 0, 0.6)',
+        'Request to Return later': 'rgba(255, 215, 0, 0.6)',
+        'Positive conversation (Initial)': 'rgba(0, 0, 255, 0.6)',
+        'Positive conversation (Detailed)': 'rgba(173, 216, 230, 0.6)',
+        'Appointment set': 'rgba(0, 128, 0, 0.6)'
+    };
+
+    let chartData;
+    if (isNumerical) {
+        chartData = {
+            labels: data.responses,
+            datasets: [{
+                label: 'Average',
+                data: data.values,
+                backgroundColor: data.responses.map(response => colorMap[response] || 'rgba(75, 192, 192, 0.6)'),
+                borderColor: data.responses.map(response => colorMap[response]?.replace('0.6', '1') || 'rgba(75, 192, 192, 1)'),
+                borderWidth: 1
+            }]
+        };
+    } else {
+        // Sort the data according to the responseOrder
+        const sortedIndices = responseOrder.map(response => data.responses.indexOf(response)).filter(index => index !== -1);
+        const sortedResponses = sortedIndices.map(index => data.responses[index]);
+        const sortedValues = sortedIndices.map(index => data.values[index]);
+
+        chartData = {
+            labels: data.options,
+            datasets: sortedResponses.map((response, index) => ({
+                label: response,
+                data: sortedValues[index],
+                backgroundColor: colorMap[response] || `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.6)`,
+                borderColor: colorMap[response]?.replace('0.6', '1') || `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`,
+                borderWidth: 1
+            }))
+        };
+    }
+
+    prospectsDataDistributionChart = new Chart(ctx, {
+        type: isNumerical ? 'bar' : 'bar',
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: !isNumerical,
+                    title: {
+                        display: true,
+                        text: isNumerical ? 'Prospect Response' : 'Options'
+                    }
+                },
+                y: {
+                    stacked: !isNumerical,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: isNumerical ? 'Average Value' : 'Count'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: !isNumerical,
+                    position: 'top'
+                },
+                title: {
+                    display: true,
+                    text: `Distribution of ${data.field}`
+                }
+            }
+        }
+    });
+}
+
+function fetchProspectsDataDistribution(field) {
+    fetch(`/get_prospects_data_distribution/${field}`)
+        .then(response => response.json())
+        .then(data => {
+            createProspectsDataDistributionChart(data);
+        })
+        .catch(error => console.error('Error:', error));
+}
+
 // Load components of the Prospect Qualification page
 document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('best-solar-panels')) {
         populateProspectPersonas();
     }
+    const fieldSelect = document.getElementById('field-select');
+
+    if (fieldSelect) {
+        fetchProspectsDataDistribution(fieldSelect.value);
+
+        fieldSelect.addEventListener('change', function() {
+            fetchProspectsDataDistribution(this.value);
+        });
+    }
 });
 
+// Scripts for the Analytics page
 // Call this function when the analytics page loads
 document.addEventListener('DOMContentLoaded', function() {
     function updateTeamOverviewData() {
@@ -567,6 +686,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(error => console.error('Error fetching reasons of no data:', error));
     }
 });
+
 
 
 

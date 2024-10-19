@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <!-- Navbar -->
 <nav id="navbar">
@@ -94,6 +95,24 @@
             </table>
         </div>
         <h2>Prospects' Data Distribution</h2>
+        <p class="data-tip"><strong>Tip:</strong> Use the dropdown to select different fields and analyze their distribution across prospect responses. Click on an element in the Legend to exclude/include it in the chart.</p>
+        <div class="chart-container">
+            <div class="chart-controls">
+                <select id="field-select">
+                    <option value="solar_panels_on_roof">Solar Panels on Roof</option>
+                    <option value="roof_type_condition">Roof Type & Condition</option>
+                    <option value="shading_issues">Shading Issues</option>
+                    <option value="appliances">Appliances</option>
+                    <option value="electricity_bill_estimate">Electricity Bill Estimate</option>
+                    <option value="number_of_decision_makers">Number of Decision Makers</option>
+                    <option value="approximate_age">Approximate Age</option>
+                    <option value="number_inhabitants">Number of Inhabitants</option>
+                </select>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="prospectsDataDistributionChart"></canvas>
+            </div>
+        </div>
         
  
         <h2>Initiatives to improve leads</h2> 

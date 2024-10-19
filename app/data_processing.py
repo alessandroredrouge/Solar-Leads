@@ -188,6 +188,60 @@ def get_prospect_personas():
 
     return {'best': best_persona, 'worst': worst_persona}
 
+#TODO: in the future you can add also the option to distinguish between absolute and normalized data
+def get_prospects_data_distribution_data(field):
+    all_data = list(collection.find())
+    
+    if field == 'electricity_bill_estimate':
+        return get_numerical_distribution(all_data, field)
+    else:
+        return get_categorical_distribution(all_data, field)
+
+def get_numerical_distribution(data, field):
+    response_values = defaultdict(list)
+    for d in data:
+        response = d['prospect_response']
+        value = d.get(field)
+        if value not in ['', 'n/a', None]:
+            try:
+                response_values[response].append(float(value))
+            except ValueError:
+                continue
+
+    responses = list(response_values.keys())
+    averages = [mean(values) if values else 0 for values in response_values.values()]
+
+    return {
+        'type': 'numerical',
+        'field': field,
+        'responses': responses,
+        'values': averages
+    }
+
+def get_categorical_distribution(data, field):
+    response_counts = defaultdict(lambda: defaultdict(int))
+    for d in data:
+        response = d['prospect_response']
+        value = d.get(field)
+        if value not in ['', 'n/a', None]:
+            if isinstance(value, list):
+                for v in value:
+                    response_counts[response][v] += 1
+            else:
+                response_counts[response][value] += 1
+
+    options = sorted(set(option for counts in response_counts.values() for option in counts.keys()))
+    responses = list(response_counts.keys())
+    values = [[response_counts[response].get(option, 0) for option in options] for response in responses]
+
+    return {
+        'type': 'categorical',
+        'field': field,
+        'options': options,
+        'responses': responses,
+        'values': values
+    }
+
 # Functions for the Analytics webpage
 
 def get_team_overview():

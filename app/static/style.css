@@ -413,8 +413,23 @@ tbody tr:hover {
 /* Team performance chart styling in Analytics page */
 .chart-container {
     width: 100%;
-    max-width: 800px;
-    margin: 20px auto;
+    max-width: 1200px; /* Adjust this value as needed */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 0;
+    padding-bottom: 56.25%; /* This creates a 16:9 aspect ratio. Adjust as needed */
+}
+
+.chart-wrapper canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .chart-controls {
@@ -555,4 +570,3 @@ tbody tr:hover {
 .page-input input[type="number"] {
     width: 80px;
 }
-
