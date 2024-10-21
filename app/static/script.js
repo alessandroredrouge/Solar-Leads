@@ -712,6 +712,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // FIXME: for some unknown reason, the if the description of the initiative is too long, the new initiative saved overwrites the previous ones in the bucket. So one has to first save the initiative with a small description, and then update it with the full description to avoid this problem. It makes no sense at all, but it is what it is
     function saveInitiative(initiative) {
         console.log('Sending initiative:', initiative);
         fetch('/save_initiative', {
