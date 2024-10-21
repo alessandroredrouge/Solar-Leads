@@ -86,7 +86,8 @@ This is an MVP for a software designed to improve door-to-door (D2D) lead genera
 │ ├── database.py # Database operations
 │ ├── main.py # Main entry point for the Flask application
 │ ├── ML_model.py # Machine learning model functions
-│ └── test_ML_model.py # Tests for the ML model
+│ ├── test_ML_model.py # Tests for the ML model
+│ └── train_ML_model.py # Run it to train the ML model
 │
 ├── venv-solar-leads/ # Virtual environment (not tracked in git)
 ├── .env # Environment variables (not tracked in git)
@@ -94,5 +95,6 @@ This is an MVP for a software designed to improve door-to-door (D2D) lead genera
 ├── build.js # Build script for frontend assets
 ├── Detailed Documentation.md # Detailed project documentation
 ├── README.md # Project documentation (this file)
-└── requirements.txt # Python dependencies
+├── requirements.txt # Python dependencies
+└── solar_lead_predictor.joblib # Pre-trained ML model (running train_ML_model.py will overwrite this file)
 ```
