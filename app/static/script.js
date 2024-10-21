@@ -67,25 +67,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Delete all data
     document.querySelectorAll('.delete-all-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert("Ahhh, so you tried to delete everything? Well, I'm one step forward than you: the 'Delete All' feature is currently disabled in the demo exactly for this reason. Muahahah, got ya!");
+            // TODO: reactivate this functionality when eventually providing the software to the client
             // Confirm with the user before deleting all data
-            if (confirm('Are you REALLY sure you want to delete all records? This action cannot be undone!')) {
-                // Send a DELETE request to the server
-                fetch(`/delete-ALL`, {
-                    method: 'DELETE',
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Reload the page after deletion
-                        window.location.reload();
-                    } else {
-                        console.error('Failed to delete all data.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error during deletion:', error);
-                });
-            }
+            // if (confirm('Are you REALLY sure you want to delete all records? This action cannot be undone!')) {
+            //     // Send a DELETE request to the server
+            //     fetch(`/delete-ALL`, {
+            //         method: 'DELETE',
+            //     })
+            //     .then(response => {
+            //         if (response.ok) {
+            //             // Reload the page after deletion
+            //             window.location.reload();
+            //         } else {
+            //             console.error('Failed to delete all data.');
+            //         }
+            //     })
+            //     .catch(error => {
+            //         console.error('Error during deletion:', error);
+            //     });
+            // }
         });
     });
 });
