@@ -117,5 +117,8 @@ config.js
 # File to use Google Maps instead of a free alternative (currently not used)
 maps_google.js
 
+# Render.yaml file
+render.yaml
+
 # End of file
 
