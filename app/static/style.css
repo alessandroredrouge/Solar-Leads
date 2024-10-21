@@ -77,6 +77,40 @@ h2 {
     border-radius: 8px;
 }
 
+/* Responsive navbar styles */
+@media (max-width: 768px) {
+    #navbar {
+        position: static;
+        margin-bottom: 20px;
+    }
+
+    #navbar ul {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    #navbar li {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+
+    #navbar a {
+        padding: 10px;
+        display: block;
+    }
+
+    .role-info {
+        width: 100%;
+        border-radius: 0;
+        margin-bottom: 10px;
+    }
+
+    body {
+        padding-top: 0;
+    }
+}
+
 /* Form styles */
 form {
     display: flex;
@@ -756,3 +790,4 @@ tbody tr:hover {
 .delete-initiative:hover {
     background-color: #ee5253;
 }
+
