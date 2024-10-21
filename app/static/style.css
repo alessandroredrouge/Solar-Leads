@@ -712,3 +712,47 @@ tbody tr:hover {
     }
 }
 
+.initiative-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.edit-initiative, .delete-initiative {
+    flex: 1;
+    margin: 0 5px;
+}
+
+.edit-initiative {
+    background-color: #5398BE;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.edit-initiative:hover {
+    background-color: #05204A;
+}
+
+.delete-initiative {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.delete-initiative:hover {
+    background-color: #ee5253;
+}

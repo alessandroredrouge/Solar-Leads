@@ -527,17 +527,21 @@ document.addEventListener('DOMContentLoaded', function() {
         item.innerHTML = `
             <span class="problem-tag">${initiative.problem}</span>
             <h4>${initiative.title}</h4>
-            <p>${initiative.description}</p>
-            <p>Timeline: ${initiative.timeline}</p>
-            <p>Cost: $${initiative.cost}</p>
-            <p>People: ${initiative.people}</p>
-            <button class="delete-initiative" data-id="${initiative._id}">Delete</button>
+            <p><i>Description:</i> ${initiative.description}</p>
+            <p><i>Timeline:</i> ${initiative.timeline}</p>
+            <p><i>Estimated Cost:</i> $${initiative.cost}</p>
+            <p><i>People Involved:</i> ${initiative.people}</p>
+            <div class="initiative-buttons">
+                <button class="edit-initiative" data-id="${initiative._id}">Edit</button>
+                <button class="delete-initiative" data-id="${initiative._id}">Delete</button>
+            </div>
             <div class="move-buttons">
                 <button class="move-initiative" data-target="${otherBuckets[0]}">Move to ${otherBuckets[0]}</button>
                 <button class="move-initiative" data-target="${otherBuckets[1]}">Move to ${otherBuckets[1]}</button>
             </div>
         `;
         item.dataset.index = index;
+        item.dataset.id = initiative._id;
         
         // Add event listener for delete button
         const deleteButton = item.querySelector('.delete-initiative');
@@ -546,6 +550,13 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteInitiative(initiative._id);
         });
         
+        // Add event listener for edit button
+        const editButton = item.querySelector('.edit-initiative');
+        editButton.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent dragging when clicking edit
+            openEditModal(initiative);
+        });
+
         // Add event listeners for move buttons
         const moveButtons = item.querySelectorAll('.move-initiative');
         moveButtons.forEach(button => {
@@ -557,6 +568,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         return item;
+    }
+
+    function openEditModal(initiative) {
+        const modal = document.getElementById('initiative-modal');
+        const form = document.getElementById('initiative-form');
+        
+        // Populate form fields with initiative data
+        document.getElementById('initiative-id').value = initiative._id;
+        document.getElementById('initiative-title').value = initiative.title;
+        document.getElementById('initiative-problem').value = initiative.problem;
+        document.getElementById('initiative-description').value = initiative.description;
+        document.getElementById('initiative-timeline').value = initiative.timeline;
+        document.getElementById('initiative-cost').value = initiative.cost;
+        document.getElementById('initiative-people').value = initiative.people;
+        
+        modal.style.display = 'block';
     }
 
     function moveInitiative(initiative, fromBucket, toBucket) {
@@ -598,6 +625,26 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => console.log(data.message))
         .catch(error => console.error('Error:', error));
     }
+
+    function updateInitiative(initiativeId, initiative) {
+        fetch(`/update_initiative/${initiativeId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(initiative),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Initiative updated:', data);
+            modal.style.display = 'none';
+            form.reset();
+            getInitiatives();
+        })
+        .catch(error => {
+            console.error('Error updating initiative:', error);
+        });
+    }    
 
     lists.forEach(list => {
         list.addEventListener('dragover', e => {
@@ -645,19 +692,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+        const initiativeId = document.getElementById('initiative-id').value;
         const initiative = {
-            title: document.getElementById('initiative-title').value,
             problem: document.getElementById('initiative-problem').value,
+            title: document.getElementById('initiative-title').value,
             description: document.getElementById('initiative-description').value,
             timeline: document.getElementById('initiative-timeline').value,
             cost: parseFloat(document.getElementById('initiative-cost').value),
             people: parseInt(document.getElementById('initiative-people').value),
-            status: 'current' // Assuming new initiatives always start as 'current'
+            status: initiativeId ? undefined : 'current' // Only set status for new initiatives
         };
         
-        console.log('Sending initiative:', initiative);
-        
-        saveInitiative(initiative);
+        if (initiativeId) {
+            // If initiativeId exists, it's an edit operation
+            updateInitiative(initiativeId, initiative);
+        } else {
+            // Otherwise, it's a new initiative
+            saveInitiative(initiative);
+        }
     });
 
     function saveInitiative(initiative) {
