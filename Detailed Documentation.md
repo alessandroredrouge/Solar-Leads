@@ -1,17 +1,18 @@
 # Features
-Here is a more detailed list of the core features that the software will have, which can be divided in:
+Here is a more detailed list of the core features that the software now has, which can be divided into:
 - Data Collection
 - Field Support
+- Prospect Qualification
 - Analytics
 
 ## Data Collection
-The software will have the ability to record information from door-to-door interactions collected by the canvassers.
-The initial data that will be collected will be divided in Mandatory and Optional.
+The software has the ability to record information from door-to-door interactions collected by the canvassers.
+The data collected is divided into Mandatory and Optional fields.
 
 **Mandatory**
 - Address
 - Timestamp (time of contact)
-- Prospect response: it represents the answer (if any) of the potential prospect. This data is subdivided in the following subcategories:
+- Prospect response: it represents the answer (if any) of the potential prospect. This data is subdivided into the following subcategories:
     - No answer
     - Direct no (Homeowner)
     - Direct no (Renters)
@@ -20,7 +21,7 @@ The initial data that will be collected will be divided in Mandatory and Optiona
     - Detailed conversations
     - Appointments set
     - Undefined
-- Reason of 'no' (if any): if the prospects says no, it can be useful to understand why. Below are some of the main reasons collected so far, that would be useful to keep track of to eventually adapt the offer:
+- Reason of 'no' (if any): if the prospects says no, it can be useful to understand why. Below are some of the main reasons collected:
     - Already got solar panels on rooftop
     - Does not make economical sense
     - Electricity bill is already low
@@ -36,100 +37,158 @@ The initial data that will be collected will be divided in Mandatory and Optiona
 **Optional**
 - Electricity bill estimate (if provided)
 - Approximate age
-- Presumed gender
-- Presumed family status (single, married,...)
+- Number of decision makers
+- Number of inhabitants
 - Solar panels on roof (Y/N)
-- House characteristics (e.g., with swimming pool, sunny area, partial shadowing from trees)
-- Interest level
+- Roof type and condition
+- Shading issues
+- House characteristics (e.g., with swimming pool, air conditioning, electric vehicle, large garden)
 - Any additional notes / comments from the canvasser
 
 ## Field Support
-The software will support the canvassers on the field thanks to the data collected. This support will be mainly provided in terms of:
-- a map
-- a route suggestion. 
+The software supports the canvassers in the field thanks to the data collected. This support is mainly provided in terms of:
+- An interactive map
+- A table containing the addresses worth returning to (AI powered feature)
+- Performance tracking
+- A customizable pitch recap
 
-**Optimized Canvassing Map**
+**Interactive Canvassing Map**
 
-This map shows the houses highlighted in different gradient of colors, from red (low probability of conversion) to green (high probability of conversion) based on how probable the software estimates that they would set up an appointment based on the data collected.
+This map shows the houses with different markers based on their status (e.g., appointment set, no answer, return later). The map uses Leaflet.js for rendering and includes features like clustering for better performance with large datasets.
 
-**Optimal Canvassing Route**
+**'Worth returning table'**
 
-By having a map that determines the probability of conversion for each address (at least the ones for which data have been collected), the software also proposes a potential route for the canvasser to follow, in order to optimize its path on that workday and enhance the chances of setting up an appointment. This route basically connects the best houses evaluated in the previous step, including considerations of the time required to go from house to house by foot.
+Table that collects the addresses with prospect responses 'No answer' or 'Request to Return later' that an ML model predicted to have high chanches of converting into a sale.
+
+**Performance Tracking**
+
+The software now provides both daily and overall performance metrics for canvassers, including:
+- Doors knocked
+- Appointments set
+- Conversion rate
+- Ranking among team members
+
+**Customizable Pitch Recap**
+
+Canvassers can view and edit a standardized pitch to help them in their interactions with potential customers.
+
+## Prospect Qualification
+This new feature helps team leaders and managers to better understand and qualify prospects. It includes:
+
+**Prospect Personas**
+
+A comparison between the characteristics of the 'Best Prospects' (those most likely to set appointments) and the 'Worst Prospects' (those most likely to decline).
+
+**Data Distribution Visualization**
+
+Interactive charts showing the distribution of various data points collected, helping to identify trends and patterns in prospect characteristics.
+
+**Initiatives Tracker**
+
+A system to create, track, and manage initiatives aimed at improving lead quality. Initiatives can be categorized as successful, current, or unsuccessful.
+
+**Pie charts**
+
+They represent the distribution of the prospect responses and the main reasons of no.
 
 ## Analytics
-The software provides analytics of different types thanks to the collected data, from identifying the customer persona to tracking performances of the canvassers, estimating the efficacy of a specific sales pitch, identifying the best areas to canvass and so on...
+The software provides analytics of different types thanks to the collected data, including:
+
+**Team Overview**
+
+Provides key metrics such as:
+- Number of team members
+- Total doors knocked
+- Total appointments set
+- Average doors knocked per day per employee
+- Average appointments set per day per employee
+- Average conversion rate
+
+**Team Performance Charts**
+
+Interactive charts showing the team's performance over time, with options to view total or daily metrics for doors knocked, appointments set, and conversion rates.
 
 # Software Structure
 
 The software can be broken down into several key components that work together to collect, store, process, and visualize data. Here's an overview of the flow:
 
-1. **User Interface (UI) for Data Collection**: A frontend interface (could be a web app or mobile app) where canvassers input data collected during door-to-door interactions.
+1. **Data Collection User Interface (UI)**: A web-based frontend interface where canvassers input data collected during door-to-door interactions.
 
-2. **Data Storage System**: A backend component that securely stores the collected data. This could be a simple database like SQLite or a cloud-based database for scalability.
+2. **Data Storage System**: A backend component that securely stores the collected data using MongoDB.
 
 3. **Field Support Tools**:
-   - **Google Maps Integration**: Uses Google Maps API to display maps and suggest optimized canvassing routes. The UI interacts with this component to display maps and routes.
-   - **Data Processing Module**: A Python program that analyzes stored data to determine conversion probabilities and optimize canvassing routes.
+   - **Map Integration**: Uses Leaflet.js to display interactive maps with data points.
+   - **Data Processing Module**: Python programs that analyze stored data to determine conversion probabilities, generate personas, and process data for various visualizations.
 
-4. **Analytics Dashboard**: A frontend component that visualizes data analytics for team leaders and canvassers to assess performance, understand customer personas, and identify effective canvassing strategies.
+4. **Prospect Qualification Tools**:
+   - **Persona Generation**: Analyzes data to create profiles of best and worst prospects.
+   - **Data Distribution Visualization**: Uses Chart.js to create interactive charts of data distributions.
+   - **Initiatives Tracker**: Allows creation and management of improvement initiatives.
 
-5. **Feedback Loop for Continuous Improvement**: A system that allows user input and feedback to refine algorithms and improve data accuracy and efficiency over time.
+5. **Analytics Dashboard**: A frontend component that visualizes team performance data and provides insights for managers.
+
+6. **Machine Learning Model**: A predictive model that estimates the probability of setting an appointment for prospects who weren't available or requested to return later.
 
 # Detailed Description of Flow of Data and Information 
 
-Let's go through the data flow step-by-step, involving each element in your software structure:
+Let's go through the data flow step-by-step, involving each element in the software structure:
 
 ## Data Collection from Canvassers (UI)
 
-- **Process**: Canvassers use a mobile or web app to input data during door-to-door visits. The data includes both mandatory and optional fields, such as the address, timestamp, homeowner response, and other details.
-- **Technologies Involved**: Frontend technologies like HTML, CSS, and JavaScript (for a web app) or React Native/Flutter (for a mobile app). Python may be used on the backend for data handling.
-- **Example**: A canvasser knocks on a door and gets a direct "no" from a renter. They enter the address, timestamp, prospect response ("Direct no (Renters)"), and optional notes into the app.
+- **Process**: Canvassers use a web app to input data during door-to-door visits. The data includes both mandatory and optional fields.
+- **Technologies Involved**: HTML, CSS, JavaScript for the frontend, Flask for the backend.
+- **Example**: A canvasser inputs data about a visit, including address, prospect response, and optional details like roof condition or electricity bill estimate.
 
 ## Data Transmission to Storage (Backend API)
 
-- **Process**: The data collected by the UI is sent to a backend API. The API is responsible for validating the input data, formatting it correctly, and storing it in a database.
-- **Technologies Involved**: Python (Flask or Django) for the API, SQL/SQLite or a cloud-based database (like PostgreSQL or MongoDB) for storage.
-- **Example**: The app sends a POST request to the API endpoint `/collect_data`, which receives the data, validates it, and stores it in the `leads` table of a SQLite database.
+- **Process**: The data collected by the UI is sent to a Flask backend API, which then stores it in MongoDB.
+- **Technologies Involved**: Flask for the API, MongoDB for storage.
+- **Example**: The app sends a POST request to the API endpoint `/save_data`, which receives the data, processes it, and stores it in the MongoDB database.
 
 ## Data Storage and Management (Database)
 
-- **Process**: The collected data is stored in a structured format within the database. This storage system needs to efficiently handle CRUD (Create, Read, Update, Delete) operations.
-- **Technologies Involved**: SQLite or another SQL-based database for the initial MVP. For more advanced versions, cloud databases (e.g., Firebase, AWS RDS) could be used.
+- **Process**: The collected data is stored in a structured format within MongoDB.
+- **Technologies Involved**: MongoDB
 - **Example**: The database stores multiple records from different canvassers, allowing for later retrieval and analysis.
 
-## Data Processing for Field Support (Backend Python Program)
+## Data Processing for Field Support and Analytics (Backend Python Programs)
 
-- **Process**: A Python script or backend service regularly processes the data to calculate conversion probabilities and generate optimized canvassing routes based on historical data and user feedback.
-- **Technologies Involved**: Python (using libraries like `pandas` for data manipulation and `scikit-learn` for any basic predictive modeling, if required).
-- **Example**: The script fetches all records from the last three months and uses the responses to calculate the likelihood of conversion for each address. It then outputs a list of addresses ranked by conversion probability.
+- **Process**: Python scripts process the data to calculate performance metrics, generate personas, and prepare data for visualizations.
+- **Technologies Involved**: Python (using libraries like pandas for data manipulation)
+- **Example**: The `get_team_overview` function in data_processing.py calculates team performance metrics.
 
-## Google Maps Integration (Maps API)
+## Map Integration (Leaflet.js)
 
-- **Process**: The processed data is sent to the Google Maps API to display maps and suggest optimized routes based on conversion probability. The UI then displays this map to the canvasser.
-- **Technologies Involved**: Google Maps JavaScript API for frontend map rendering, Python `requests` library to interact with Google Maps API on the backend if needed.
-- **Example**: The app displays a map with markers showing houses in different colors based on their conversion probability. A route is suggested that minimizes walking time while maximizing contact with high-probability houses.
+- **Process**: The processed data is used to create interactive maps showing the status of different addresses.
+- **Technologies Involved**: Leaflet.js for frontend map rendering, Flask routes to serve map data.
+- **Example**: The Field Support page displays a map with markers showing houses visited, color-coded by their status.
 
 ## Analytics and Reporting (Analytics Dashboard)
 
-- **Process**: The data collected and processed is visualized through dashboards that provide insights into canvasser performance, customer personas, and effective canvassing strategies.
-- **Technologies Involved**: Python (using libraries like `matplotlib` or `seaborn` for visualization), JavaScript frameworks like React or Vue.js for interactive dashboards.
-- **Example**: A dashboard displays graphs showing the number of appointments set by each canvasser over time, identifying top performers and areas needing improvement.
+- **Process**: The processed data is visualized through dashboards that provide insights into team performance and prospect characteristics.
+- **Technologies Involved**: Chart.js for interactive charts, Flask routes to serve data for charts.
+- **Example**: The Analytics page displays charts showing team performance over time and provides a team overview.
 
-## Feedback Loop for Continuous Improvement
+## Machine Learning Model for Prediction
 
-- **Process**: The software collects feedback from users (canvassers and managers) about the accuracy and effectiveness of the predictions and route suggestions. This feedback is used to refine the data processing algorithms and improve system performance over time.
-- **Technologies Involved**: Python for backend adjustments and improvements, database updates for tracking changes.
-- **Example**: Canvassers note that certain "high-probability" houses are repeatedly uninterested. This feedback prompts an algorithm adjustment to weigh certain data points differently.
+- **Process**: A machine learning model predicts the probability of setting an appointment for prospects who weren't available or requested to return later.
+- **Technologies Involved**: Python (scikit-learn for model training and prediction)
+- **Example**: The `SolarLeadPredictor` class in ML_model.py trains models and makes predictions based on prospect data.
 
 # Example in Reality
 
-Imagine a day in the life of a canvasser using this software:
+Imagine a day in the life of a solar sales team using this software:
 
-1. **Morning Briefing**: The canvasser logs into the app to see their assigned route for the day. The route is optimized based on conversion probabilities calculated from historical data.
+1. **Morning Briefing**: Team members log into the app to review their performance from the previous day and check the map for today's canvassing area.
 
-2. **Canvassing**: At each house, the canvasser records the interaction in real-time using the app. If the prospect is uninterested, they select the appropriate reason for the "no" and add any additional notes.
+2. **Canvassing**: Throughout the day, canvassers record each interaction in real-time using the data collection interface.
 
-3. **Data Processing and Analysis**: As the day progresses, the backend system collects all entries and processes them in real-time. The Python program updates the probability calculations based on new data points and feeds this information back into the route optimization tool.
+3. **Field Support**: Canvassers use the interactive map to navigate their assigned area efficiently. They can refer to the pitch recap for guidance during interactions.
 
-4. **End of Day Reporting**: After canvassing, the canvasser reviews a summary of their day's performance on the analytics dashboard. The team leader uses the aggregated data to assess the effectiveness of current strategies and plan future efforts.
+4. **Data Processing and Analysis**: As data is collected, the backend continuously processes it, updating performance metrics and refining the machine learning model's predictions.
 
+5. **Team Leader Review**: At the end of the day, team leaders use the Prospect Qualification page to analyze the day's data, identify trends, and plan strategies for improvement.
+
+6. **Manager Overview**: Managers use the Analytics page to get a high-level view of the team's performance, identify top performers, and make data-driven decisions for the sales strategy.
+
+This integrated approach allows for a continuous feedback loop, where data collected in the field immediately informs strategy and supports decision-making at all levels of the organization.
