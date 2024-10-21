@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Team' Performance chart in Analytics page
+// Team' Performance chart
 let teamPerformanceChart;
 let teamPerformanceData;
 
@@ -844,7 +844,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Prospects' Response chart in Analytics page
+// Prospects' Response chart 
 let prospectResponsesChart;
 let prospectResponsesData;
 
@@ -889,7 +889,7 @@ function createProspectResponsesChart(data) {
     });
 }
 
-// Reasons of No chart in Analytics page
+// Reasons of No chart 
 let reasonsOfNoChart;
 let reasonsOfNoData;
 
@@ -934,7 +934,7 @@ function createReasonsOfNoChart(data) {
     });
 }
 
-// Load the pie charts in Analytics page
+// Load the pie charts
 document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('prospectResponsesChart')) {
         fetchProspectResponsesData().then(data => {
