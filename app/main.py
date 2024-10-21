@@ -257,14 +257,16 @@ def get_team_performance_data():
 
 @app.route('/get_prospect_responses', methods=['GET'])
 def get_prospect_responses_data():
-    if session.get('role') != 'Manager':
+    role = session.get('role')
+    if not role or role == 'Canvasser':
         return jsonify({"error": "Unauthorized"}), 403
     data = get_prospect_responses()
     return jsonify(data)
 
 @app.route('/get_reasons_of_no', methods=['GET'])
 def get_reasons_of_no_data():
-    if session.get('role') != 'Manager':
+    role = session.get('role')
+    if not role or role == 'Canvasser':
         return jsonify({"error": "Unauthorized"}), 403
     data = get_reasons_of_no()
     return jsonify(data)
