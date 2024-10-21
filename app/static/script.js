@@ -864,27 +864,54 @@ function createProspectResponsesChart(data) {
         prospectResponsesChart.destroy();
     }
 
+    // Define the order and colors to match the histogram chart
+    const responseOrder = [
+        'Undefined',
+        'No answer',
+        'Not interested (Renter)',
+        'Not interested (Homeowner)',
+        'Request to Return later',
+        'Positive conversation (Initial)',
+        'Positive conversation (Detailed)',
+        'Appointment set'
+    ];
+
+    const colorMap = {
+        'Undefined': 'rgba(255, 255, 255, 0.6)',
+        'No answer': 'rgba(128, 128, 128, 0.6)',
+        'Not interested (Renter)': 'rgba(255, 165, 0, 0.6)',
+        'Not interested (Homeowner)': 'rgba(255, 0, 0, 0.6)',
+        'Request to Return later': 'rgba(255, 215, 0, 0.6)',
+        'Positive conversation (Initial)': 'rgba(0, 0, 255, 0.6)',
+        'Positive conversation (Detailed)': 'rgba(173, 216, 230, 0.6)',
+        'Appointment set': 'rgba(0, 128, 0, 0.6)'
+    };
+
+    // Sort and filter the data according to the defined order
+    const sortedData = responseOrder
+        .filter(response => data.hasOwnProperty(response))
+        .map(response => ({
+            response: response,
+            count: data[response]
+        }));
+
     prospectResponsesChart = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: Object.keys(data),
+            labels: sortedData.map(item => item.response),
             datasets: [{
-                data: Object.values(data),
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.8)',
-                    'rgba(54, 162, 235, 0.8)',
-                    'rgba(255, 206, 86, 0.8)',
-                    'rgba(75, 192, 192, 0.8)',
-                    'rgba(153, 102, 255, 0.8)',
-                    'rgba(255, 159, 64, 0.8)',
-                    'rgba(201, 203, 207, 0.8)',
-                    'rgba(50, 100, 192, 0.8)'
-                ],
+                data: sortedData.map(item => item.count),
+                backgroundColor: sortedData.map(item => colorMap[item.response]),
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                }
+            }
         }
     });
 }
@@ -947,6 +974,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(error => console.error('Error fetching reasons of no data:', error));
     }
 });
+
 
 
 
