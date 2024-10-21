@@ -483,6 +483,214 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const lists = document.querySelectorAll('.initiative-list');
+    const addButton = document.getElementById('add-initiative');
+    const modal = document.getElementById('initiative-modal');
+    const closeBtn = modal.querySelector('.close');
+    const form = document.getElementById('initiative-form');
+
+    function getInitiatives() {
+        fetch('/get_initiatives')
+            .then(response => response.json())
+            .then(data => {
+                initiatives = {
+                    successful: data.filter(i => i.status === 'successful'),
+                    current: data.filter(i => i.status === 'current'),
+                    unsuccessful: data.filter(i => i.status === 'unsuccessful')
+                };
+                renderInitiatives();
+            })
+            .catch(error => console.error('Error fetching initiatives:', error));
+    }
+
+    function renderInitiatives() {
+    Object.keys(initiatives).forEach(status => {
+        const list = document.getElementById(`${status}-list`);
+        list.innerHTML = '';
+        initiatives[status].forEach((initiative, index) => {
+            const item = createInitiativeElement(initiative, index, status);
+            list.appendChild(item);
+        });
+    });
+}
+
+    function createInitiativeElement(initiative, index, currentBucket) {
+        const item = document.createElement('div');
+        item.classList.add('initiative-item');
+        item.draggable = true;
+        
+        // Determine the other two buckets
+        const buckets = ['successful', 'current', 'unsuccessful'];
+        const otherBuckets = buckets.filter(bucket => bucket !== currentBucket);
+
+        item.innerHTML = `
+            <span class="problem-tag">${initiative.problem}</span>
+            <h4>${initiative.title}</h4>
+            <p>${initiative.description}</p>
+            <p>Timeline: ${initiative.timeline}</p>
+            <p>Cost: $${initiative.cost}</p>
+            <p>People: ${initiative.people}</p>
+            <button class="delete-initiative" data-id="${initiative._id}">Delete</button>
+            <div class="move-buttons">
+                <button class="move-initiative" data-target="${otherBuckets[0]}">Move to ${otherBuckets[0]}</button>
+                <button class="move-initiative" data-target="${otherBuckets[1]}">Move to ${otherBuckets[1]}</button>
+            </div>
+        `;
+        item.dataset.index = index;
+        
+        // Add event listener for delete button
+        const deleteButton = item.querySelector('.delete-initiative');
+        deleteButton.addEventListener('click', function(e) {
+            e.stopPropagation(); // Prevent dragging when clicking delete
+            deleteInitiative(initiative._id);
+        });
+        
+        // Add event listeners for move buttons
+        const moveButtons = item.querySelectorAll('.move-initiative');
+        moveButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent dragging when clicking move
+                const targetBucket = this.getAttribute('data-target');
+                moveInitiative(initiative, currentBucket, targetBucket);
+            });
+        });
+        
+        return item;
+    }
+
+    function moveInitiative(initiative, fromBucket, toBucket) {
+        // Remove initiative from current bucket
+        initiatives[fromBucket] = initiatives[fromBucket].filter(init => init._id !== initiative._id);
+        
+        // Add initiative to new bucket
+        initiatives[toBucket].push(initiative);
+        
+        // Update initiative status in the database
+        updateInitiativeStatus(initiative._id, toBucket);
+        
+        // Re-render initiatives
+        renderInitiatives();
+    }
+    function deleteInitiative(initiativeId) {
+        if (confirm('Are you sure you want to delete this initiative?')) {
+            fetch(`/delete_initiative/${initiativeId}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+                getInitiatives();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+
+    function updateInitiativeStatus(initiativeId, newStatus) {
+        fetch(`/update_initiative/${initiativeId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus }),
+        })
+        .then(response => response.json())
+        .then(data => console.log(data.message))
+        .catch(error => console.error('Error:', error));
+    }
+
+    lists.forEach(list => {
+        list.addEventListener('dragover', e => {
+            e.preventDefault();
+            const draggingItem = document.querySelector('.dragging');
+            const afterElement = getDragAfterElement(list, e.clientY);
+            if (afterElement == null) {
+                list.appendChild(draggingItem);
+            } else {
+                list.insertBefore(draggingItem, afterElement);
+            }
+        });
+
+        list.addEventListener('dragend', () => {
+            const items = Array.from(list.querySelectorAll('.initiative-item'));
+            const bucketId = list.id.split('-')[0];
+            initiatives[bucketId] = items.map(item => initiatives[item.dataset.bucketId][item.dataset.index]);
+            saveInitiative();
+            renderInitiatives();
+        });
+    });
+
+    // FIXME: you can currently drag initiatives between buckets, but you can't drop them in the bucket
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.initiative-item:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    addButton.addEventListener('click', () => {
+        form.reset();
+        modal.style.display = 'block';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const initiative = {
+            title: document.getElementById('initiative-title').value,
+            problem: document.getElementById('initiative-problem').value,
+            description: document.getElementById('initiative-description').value,
+            timeline: document.getElementById('initiative-timeline').value,
+            cost: parseFloat(document.getElementById('initiative-cost').value),
+            people: parseInt(document.getElementById('initiative-people').value),
+            status: 'current' // Assuming new initiatives always start as 'current'
+        };
+        
+        console.log('Sending initiative:', initiative);
+        
+        saveInitiative(initiative);
+    });
+
+    function saveInitiative(initiative) {
+        console.log('Sending initiative:', initiative);
+        fetch('/save_initiative', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(initiative),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Initiative saved:', data);
+            renderInitiatives();
+            modal.style.display = 'none';
+            form.reset();
+            getInitiatives();
+        })
+        .catch(error => {
+            console.error('Error saving initiative:', error);
+        });
+    }
+    getInitiatives();
+});
+
 // Scripts for the Analytics page
 // Call this function when the analytics page loads
 document.addEventListener('DOMContentLoaded', function() {

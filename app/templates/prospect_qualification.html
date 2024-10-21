@@ -114,13 +114,59 @@
             </div>
         </div>
         
- 
-        <h2>Initiatives to improve leads</h2> 
-        <p class="data-tip"><strong>Tip:</strong> Try to insert your initiative.</p>
-        <!-- There are 3 buckets: Succesful, Current and Unsuccesfull Initiatives.
-         For each bucket, Create a structure containing different tasks that can be saved and visualized, of which you can change order through drag & drop, that with two buttons you can or eliminate definitively or move in another bucket
-         Each element contains the problem the initiative addresses (as a colored tag), its title , a brief description, a timeline, an estimation of costs and of people to involve -->
-    
+        <h2>Initiatives to Improve Leads</h2> 
+        <p class="data-tip"><strong>Tip:</strong> Create initiatives to enhance lead quality. You can edit, delete, or move initiatives between buckets to track their progress and effectiveness.</p>
+        <div class="initiatives-container">
+            <div class="initiative-bucket" id="successful-initiatives">
+                <h3>Successful Initiatives</h3>
+                <div class="initiative-list" id="successful-list"></div>
+            </div>
+            <div class="initiative-bucket" id="current-initiatives">
+                <h3>Current Initiatives</h3>
+                <div class="initiative-list" id="current-list"></div>
+            </div>
+            <div class="initiative-bucket" id="unsuccessful-initiatives">
+                <h3>Unsuccessful Initiatives</h3>
+                <div class="initiative-list" id="unsuccessful-list"></div>
+            </div>
+        </div>
+        <button id="add-initiative">Add New Initiative</button>
+        
+        <!-- Initiative Modal -->
+        <div id="initiative-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Initiative Details</h2>
+                <form id="initiative-form">
+                    <input type="hidden" id="initiative-id">
+                    <div class="form-group">
+                        <label for="initiative-title">Title:</label>
+                        <input type="text" id="initiative-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="initiative-problem">Problem Addressed:</label>
+                        <input type="text" id="initiative-problem" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="initiative-description">Description:</label>
+                        <textarea id="initiative-description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="initiative-timeline">Timeline:</label>
+                        <input type="text" id="initiative-timeline" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="initiative-cost">Estimated Cost:</label>
+                        <input type="number" id="initiative-cost" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="initiative-people">People Involved:</label>
+                        <input type="number" id="initiative-people" required>
+                    </div>
+                    <button type="submit">Save Initiative</button>
+                </form>
+            </div>
+        </div>
     </div>
 </body>
 </html>

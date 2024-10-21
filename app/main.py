@@ -4,7 +4,7 @@
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
 from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction, get_prospect_personas, get_prospects_data_distribution_data
-from database import save_data, delete_data, delete_ALL_data, load_data, load_num_of_data, load_ML_prediction_data, get_map_data, get_last_available_date_for_user
+from database import save_data, delete_data, delete_ALL_data, load_data, load_num_of_data, load_ML_prediction_data, get_map_data, get_last_available_date_for_user, save_initiative, get_initiatives, update_initiative, delete_initiative
 from datetime import datetime
 from ML_model import load_trained_model
 import os
@@ -213,6 +213,33 @@ def get_prospects_data_distribution(field):
         return jsonify({"error": "Unauthorized"}), 403
     data = get_prospects_data_distribution_data(field)
     return jsonify(data)
+
+@app.route('/save_initiative', methods=['POST'])
+def save_initiative_route():
+    initiative = request.json
+    if not initiative:
+        return jsonify({"error": "No data provided"}), 400
+    initiative_id = save_initiative(initiative)
+    return jsonify({"message": "Initiative saved successfully", "id": str(initiative_id)}), 200
+
+@app.route('/get_initiatives', methods=['GET'])
+def get_initiatives_route():
+    initiatives = get_initiatives()
+    # Convert ObjectId to string for JSON serialization
+    for initiative in initiatives:
+        initiative['_id'] = str(initiative['_id'])
+    return jsonify(initiatives)
+
+@app.route('/update_initiative/<initiative_id>', methods=['PUT'])
+def update_initiative_route(initiative_id):
+    updated_data = request.json
+    update_initiative(initiative_id, updated_data)
+    return jsonify({"message": "Initiative updated successfully"}), 200
+
+@app.route('/delete_initiative/<initiative_id>', methods=['DELETE'])
+def delete_initiative_route(initiative_id):
+    delete_initiative(initiative_id)
+    return jsonify({"message": "Initiative deleted successfully"}), 200
 
 @app.route('/get_team_overview', methods=['GET'])
 def get_team_overview_data():

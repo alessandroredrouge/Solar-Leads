@@ -24,6 +24,7 @@ client = MongoClient(MONGO_URI)
 db = client['solar_d2d_lead_generation_tracker']
 #TODO: remember to change the collection name to 'prospects' when the real data is being collected
 collection = db['fake_data_for_demo'] # 'prospects' is the collection with the real data collected from the field, 'fake_data_for_demo' is the temporarily one with fake data
+initiatives_collection = db['fake_initiatives_for_demo']
 
 def save_data(data, role, nickname):
     # Assign the 'Submitted by' field
@@ -139,3 +140,20 @@ def update_prediction_fields(document_id, probability, worth_returning):
             'ML_model_pred_worth_returning': worth_returning
         }}
     )
+
+# Initiatives database functions
+def save_initiative(initiative):
+    result = initiatives_collection.insert_one(initiative)
+    return str(result.inserted_id)
+
+def get_initiatives():
+    return list(initiatives_collection.find())
+
+def update_initiative(initiative_id, updated_data):
+    initiatives_collection.update_one(
+        {'_id': ObjectId(initiative_id)},
+        {'$set': updated_data}
+    )
+
+def delete_initiative(initiative_id):
+    initiatives_collection.delete_one({'_id': ObjectId(initiative_id)})
