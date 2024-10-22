@@ -513,6 +513,11 @@ tbody tr:hover {
     flex-grow: 1;
 }
 
+.legend-text {
+    cursor: pointer;
+    user-select: none;
+}
+
 /* Autocomplete container */
 .autocomplete-container {
     width: 100%;

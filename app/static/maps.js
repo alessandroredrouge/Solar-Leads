@@ -249,7 +249,7 @@ function createLegend() {
         
         row.appendChild(svg);
         row.innerHTML += `
-            <span>${key}</span>
+            <span class="legend-text" onclick="toggleMarkers('${key}')">${key}</span>
             <input type="checkbox" checked onchange="toggleMarkers('${key}')">
         `;
         legend.appendChild(row);
@@ -323,11 +323,17 @@ function toggleMarkers(response) {
         });
     }
 
-    // Update checkbox state for all affected responses
+    // Update checkbox state and text style for all affected responses
     responsesToToggle.forEach(resp => {
-        const checkbox = document.querySelector(`input[type="checkbox"][onchange="toggleMarkers('${resp}')"]`);
-        if (checkbox) {
-            checkbox.checked = visibleResponses.has(resp);
+        const legendItem = document.querySelector(`.legend-item:has(input[onchange="toggleMarkers('${resp}')"])`);
+        if (legendItem) {
+            const checkbox = legendItem.querySelector('input[type="checkbox"]');
+            const textSpan = legendItem.querySelector('.legend-text');
+            const isVisible = visibleResponses.has(resp);
+            
+            checkbox.checked = isVisible;
+            textSpan.style.textDecoration = isVisible ? 'none' : 'line-through';
+            textSpan.style.opacity = isVisible ? '1' : '0.5';
         }
     });
 }
@@ -643,3 +649,4 @@ document.addEventListener('DOMContentLoaded', () => {
         initAutocomplete();
     }
 });
+
