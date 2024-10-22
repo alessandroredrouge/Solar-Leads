@@ -563,21 +563,31 @@ tbody tr:hover {
     color: #888;
 }
 
-/* Full-screen button styles */
 .fullscreen-button {
     position: absolute;
     top: 10px;
-    left: 10px;
+    left: 0px;
     z-index: 1000;
     background: white;
     border: 2px solid rgba(0,0,0,0.2);
     border-radius: 4px;
     padding: 5px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
 }
 
 .fullscreen-button:hover {
     background: #f4f4f4;
+}
+
+.fullscreen-button svg {
+    width: 20px;
+    height: 20px;
+    fill: #333;
 }
 
 /* Full-screen map styles */

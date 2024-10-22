@@ -111,7 +111,11 @@ async function initMap() {
     const fullscreenControl = L.control({position: 'topleft'});
     fullscreenControl.onAdd = function(map) {
         const button = L.DomUtil.create('button', 'fullscreen-button');
-        button.innerHTML = '&#x26F6;'; // Unicode for 'enter fullscreen' icon
+        button.innerHTML = `
+            <svg class="fullscreen-icon" width="24" height="24">
+                <use xlink:href="#fullscreen-enter-icon"></use>
+            </svg>
+        `;
         button.onclick = toggleFullScreen;
         return button;
     };
@@ -331,6 +335,7 @@ function toggleMarkers(response) {
 function toggleFullScreen() {
     const mapElement = document.getElementById('map');
     const fullscreenButton = document.querySelector('.fullscreen-button');
+    const fullscreenIcon = fullscreenButton.querySelector('.fullscreen-icon use');
 
     if (!document.fullscreenElement) {
         if (mapElement.requestFullscreen) {
@@ -343,7 +348,7 @@ function toggleFullScreen() {
             mapElement.msRequestFullscreen();
         }
         mapElement.classList.add('map-fullscreen');
-        fullscreenButton.innerHTML = '&#x26F6;'; // Unicode for 'exit fullscreen' icon
+        fullscreenIcon.setAttribute('xlink:href', '#fullscreen-exit-icon');
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
@@ -355,7 +360,7 @@ function toggleFullScreen() {
             document.msExitFullscreen();
         }
         mapElement.classList.remove('map-fullscreen');
-        fullscreenButton.innerHTML = '&#x26F6;'; // Unicode for 'enter fullscreen' icon
+        fullscreenIcon.setAttribute('xlink:href', '#fullscreen-enter-icon');
     }
 }
 
