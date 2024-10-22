@@ -6,7 +6,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
 import joblib
-from database import load_data, update_prediction_fields
+from app.database import load_data, update_prediction_fields
 
 class SolarLeadPredictor:
     def __init__(self):

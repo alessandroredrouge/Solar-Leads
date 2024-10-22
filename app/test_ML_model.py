@@ -1,5 +1,5 @@
-from ML_model import load_trained_model
-from database import load_data
+from app.ML_model import load_trained_model
+from app.database import load_data
 import random
 
 def get_test_cases(data, n=100):
