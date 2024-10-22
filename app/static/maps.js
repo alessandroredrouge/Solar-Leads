@@ -86,9 +86,13 @@ async function initMap() {
     L.control.custom({
         position: 'topright',
         content: `
-            <div id="autocomplete-container" class="geocoder-container" style="margin-left: 50px;">
+            <div id="autocomplete-container" class="geocoder-container" style="
+                margin-left: 10px;
+                width: calc(100% - 20px);
+                max-width: 400px;
+            ">
                 <input type="text" id="address" placeholder="Enter an address here" style="
-                    width: 400px;
+                    width: 100%;
                     padding: 5px;
                     border: 1px solid #ccc;
                     border-radius: 4px;
