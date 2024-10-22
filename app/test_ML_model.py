@@ -1,6 +1,11 @@
-from app.ML_model import load_trained_model
-from app.database import load_data
+import os
 import random
+if os.environ.get('FLASK_ENV') == 'production':
+    from app.ML_model import load_trained_model
+    from app.database import load_data
+else:
+    from ML_model import load_trained_model
+    from database import load_data
 
 def get_test_cases(data, n=100):
     no_answer = [d for d in data if d['prospect_response'] == 'No answer']

@@ -5,8 +5,12 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
-import joblib
-from app.database import load_data, update_prediction_fields
+import joblib   
+import os
+if os.environ.get('FLASK_ENV') == 'production':
+    from app.database import load_data, update_prediction_fields
+else:
+    from database import load_data, update_prediction_fields
 
 class SolarLeadPredictor:
     def __init__(self):
