@@ -1,4 +1,6 @@
-const apiKey = config.geoapifyApiKey;
+// This is how you get the API locally, but in the deployment environment another approach is needed
+// const apiKey = config.geoapifyApiKey; 
+let apiKey
 let map;
 let markers = [];
 let markerCluster;
@@ -19,6 +21,21 @@ const colorMap = {
     'No answer': '%23808080',
     'Undefined': '%23ffffff'
 };
+
+// Function to fetch the API key
+async function fetchApiKey() {
+try {
+    const response = await fetch('/get-api-key');
+    const data = await response.json();
+    apiKey = data.apiKey;
+    initMap(); // Call initMap after getting the API key
+} catch (error) {
+    console.error('Error fetching API key:', error);
+}
+}
+
+// Call this function when the script loads
+fetchApiKey();
 
 function initMap() {
     map = L.map('map').setView([-28.0167, 153.4000], 11);

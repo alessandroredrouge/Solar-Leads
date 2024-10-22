@@ -290,6 +290,10 @@ def sync_data():
         return jsonify({"error": str(e)}), 500
 
 # Routes for Map related features
+@app.route('/get-api-key')
+def get_api_key():
+    return jsonify({'apiKey': os.environ.get('GEOAPIFY_API_KEY')})
+
 @app.route('/get_map_data')
 def get_all_map_data():
     data = get_map_data()
