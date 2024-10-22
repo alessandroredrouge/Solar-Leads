@@ -28,6 +28,14 @@ def login():
     """
     return render_template('login.html')
 
+# Route for About Page
+@app.route('/about', methods=['GET'])
+def about():
+    """
+    Renders the About page.
+    """
+    return render_template('about.html')
+
 # Route for Role Selection Page
 @app.route('/role_selection', methods=['GET', 'POST'])
 def role_selection():

@@ -986,3 +986,242 @@ tbody tr:hover {
     background-color: #ee5253;
 }
 
+/* About page styles */
+/* Add these styles to your existing CSS file */
+
+.about-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.about-page header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.about-page h1 {
+    font-size: 2.5rem;
+    color: #AA1155;
+    margin-top: 1rem;
+}
+
+.about-intro {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.feature-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    color: #F29C38;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.2rem;
+    color: #4a4a4a;
+    margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.about-details {
+    margin-bottom: 3rem;
+}
+
+.about-details h2 {
+    font-size: 1.8rem;
+    color: #AA1155;
+    margin-bottom: 1rem;
+}
+
+.about-details ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.about-details li {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.about-details li::before {
+    content: "\f00c";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    color: #F29C38;
+    position: absolute;
+    left: 0;
+}
+
+.cta-section {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.cta-section h2 {
+    font-size: 1.8rem;
+    color: #AA1155;
+    margin-bottom: 1rem;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    color: #fff;
+    background-color: #F29C38;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #AA1155;
+}
+
+.cta-subtext {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.about-page footer {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.about-page footer a {
+    color: #AA1155;
+    text-decoration: none;
+}
+
+.about-page footer a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .about-page h1 {
+        font-size: 2rem;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .about-details li {
+        font-size: 1rem;
+    }
+
+    .cta-section h2 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Author section styles */
+.author-section {
+    margin-top: 2rem; /* Reduced from 3rem */
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+.author-section h2 {
+    text-align: center;
+    color: #AA1155;
+    margin-bottom: 1.5rem; /* Reduced from 2rem */
+}
+
+.author-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.author-card {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.author-card:hover {
+    transform: translateY(-5px);
+}
+
+.author-card i {
+    font-size: 2.5rem;
+    color: #F29C38;
+    margin-bottom: 1rem;
+}
+
+.author-card h3 {
+    font-size: 1.2rem;
+    color: #4a4a4a;
+    margin-bottom: 0.5rem;
+}
+
+.author-card ul {
+    list-style-type: none;
+    padding-left: 0;
+    text-align: left;
+}
+
+.author-card li {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    position: relative;
+    padding-left: 1.2em; /* Add space for the dot */
+}
+
+.author-card li::before {
+    content: "\2022"; /* Unicode character for a bullet point */
+    color: #F29C38; /* Yellow color for the dot */
+    font-size: 1.2em; /* Slightly larger dot */
+    position: absolute;
+    left: 0;
+    top: -0.1em; /* Adjust vertical position */
+}
+
+.author-card p {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .author-grid {
+        grid-template-columns: 1fr;
+    }
+}

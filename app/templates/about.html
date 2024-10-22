@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Leads - About</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <div class="flex-container about-page">
+        <button id="backToLogin" onclick="window.location.href='/'">Back to Login</button>
+        
+        <header>
+            <h1>Revolutionizing Door-to-Door Solar Sales</h1>
+        </header>
+
+        <section class="about-intro">
+            <p>Solar Leads empowers residential solar lead generation and sales teams with data-driven insights and AI-optimized strategies, transforming traditional door-to-door sales into a highly efficient, targeted approach.</p>
+        </section>
+
+        <section class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-database"></i>
+                <h3>Smart Data Collection</h3>
+                <p>Capture crucial prospect information in real-time, building a comprehensive database for informed decision-making.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-map-marked-alt"></i>
+                <h3>Interactive Field Support</h3>
+                <p>Navigate efficiently with AI-optimized routes and interactive maps, maximizing your team's effectiveness.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-user-check"></i>
+                <h3>Prospect Qualification</h3>
+                <p>Leverage AI-driven insights to identify and prioritize high-potential leads, increasing conversion rates.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Performance Analytics</h3>
+                <p>Track team and individual performance with detailed analytics, driving continuous improvement.</p>
+            </div>
+        </section>
+
+        <section class="about-details">
+            <h2>Why Solar Leads?</h2>
+            <ul>
+                <li>Boost your sales pipeline by up to 7% monthly with our in-house developed ML model, the 'Solar Lead Predictor', eliminating losses from random door-to-door canvassing</li>
+                <li>Drastically increase your conversion rates through data-driven prospect qualification</li>
+                <li>Empower your team with real-time field support and performance tracking</li>
+                <li>Make informed decisions with comprehensive analytics and insights</li>
+                <li>Keep track of your team's performance and productivity, ensuring that the best practices are followed throughout the company</li>
+            </ul>
+        </section>
+
+        <section class="cta-section">
+            <h2>Ready to Transform Your Solar Sales Approach?</h2>
+            <button id="tryDemo" class="main-button pulsate" style="background-color: #F29C38">Try the demo!</button>
+            <p class="cta-subtext">Experience the power of data-driven solar sales firsthand.</p>
+        </section>
+        <section class="author-section">
+            <h2>About the Author</h2>
+            <div class="author-grid">
+                <div class="author-card">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>Education</h3>
+                    <ul>
+                        <li>Bachelor's Degree in Mechanical Engineering @ University of Genoa</li>
+                        <li>Master's Degree in Renewable Energy Engineering @ Polytechnic of Turin + Erasmus @ University of Coimbra</li>
+                        <li>MBA @ Collège Des Ingénieurs</li>
+                    </ul>
+                </div>
+                <div class="author-card">
+                    <i class="fas fa-briefcase"></i>
+                    <h3>Work Experience</h3>
+                    <ul>
+                        <li>Energy Storage Analyst @ BKW</li>
+                        <li>Technology Strategy Analyst @ Accenture</li>
+                        <li>Business Development & Strategy Manager @ GOLDBECK SOLAR</li>
+                    </ul>
+                </div>
+                <div class="author-card">
+                    <i class="fas fa-globe"></i>
+                    <h3>Current Projects</h3>
+                    <p>Currently traveling around the world, volunteering, freelancing, having fun, and looking for the right idea to build the next big thing in the renewable energy sector – stay tuned!</p>
+                </div>
+            </div>
+        </section>  
+
+        <footer>
+            <p>Developed by <a href="https://www.linkedin.com/in/alessandro-rossi1/" target="_blank" rel="noopener noreferrer">Alessandro Rossi</a></p>
+            <p>For inquiries, contact <a href="mailto:solar.leads@outlook.com">solar.leads@outlook.com</a></p>
+        </footer>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

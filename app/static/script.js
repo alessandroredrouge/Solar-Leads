@@ -6,6 +6,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const companyLoginBtn = document.getElementById('companyLogin');
     const tryDemoBtn = document.getElementById('tryDemo');
+    const aboutProjectBtn = document.getElementById('aboutProject');
 
     if (companyLoginBtn) {
         companyLoginBtn.addEventListener('click', function() {
@@ -16,6 +17,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (tryDemoBtn) {
         tryDemoBtn.addEventListener('click', function() {
             window.location.href = '/role_selection';
+        });
+    }
+
+    if (aboutProjectBtn) {
+        aboutProjectBtn.addEventListener('click', function() {
+            window.location.href = '/about';
         });
     }
 });
