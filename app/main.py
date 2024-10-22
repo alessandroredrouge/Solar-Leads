@@ -3,10 +3,10 @@
 # Programming Language: Python (Flask).
 
 from flask import Flask, render_template, request, session, redirect, url_for, session, flash, jsonify
-from data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction, get_prospect_personas, get_prospects_data_distribution_data
-from database import save_data, delete_data, delete_ALL_data, load_data, load_num_of_data, load_ML_prediction_data, get_map_data, get_last_available_date_for_user, save_initiative, get_initiatives, update_initiative, delete_initiative
+from app.data_processing import sync_local_cache, get_one_day_performance, get_overall_performance, get_team_overview, get_team_performance, get_prospect_responses, get_reasons_of_no, prepare_data_for_prediction, get_prospect_personas, get_prospects_data_distribution_data
+from app.database import save_data, delete_data, delete_ALL_data, load_data, load_num_of_data, load_ML_prediction_data, get_map_data, get_last_available_date_for_user, save_initiative, get_initiatives, update_initiative, delete_initiative
 from datetime import datetime
-from ML_model import load_trained_model
+from app.ML_model import load_trained_model
 import os
 
 
