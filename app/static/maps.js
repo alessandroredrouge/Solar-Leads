@@ -118,7 +118,14 @@ function fetchMapData() {
         .catch(error => console.error('Error fetching map data:', error));
 }
 
-function createMarkers(data) {
+async function createMarkers(data) {
+    if (!apiKey) {
+        apiKey = await fetchApiKey();
+        if (!apiKey) {
+            console.error('API key not set');
+            return;
+        }
+    }
     data.forEach(item => {
         const lat = parseFloat(item.latitude);
         const lng = parseFloat(item.longitude);
@@ -327,7 +334,14 @@ function formatValue(value) {
     return value;
 }
 
-function addressAutocomplete(containerElement, callback, options) {
+async function addressAutocomplete(containerElement, callback, options) {
+    if (!apiKey) {
+        apiKey = await fetchApiKey();
+        if (!apiKey) {
+            console.error('API key not set');
+            return;
+        }
+    }
     const MIN_ADDRESS_LENGTH = 3;
     const DEBOUNCE_DELAY = 100;
 
