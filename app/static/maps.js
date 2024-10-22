@@ -307,7 +307,12 @@ function toggleMarkers(response) {
     });
 }
 
-function initVisibleResponses() {
+async function initVisibleResponses() {
+    const apiKey = await fetchApiKey();
+    if (!apiKey) {
+        console.error('API key not set');
+        return;
+    }
     visibleResponses = new Set(Object.keys(colorMap));
 }
 
@@ -545,7 +550,12 @@ function addressAutocomplete(containerElement, callback, options) {
     });
 }
 
-function initAutocomplete() {
+async function initAutocomplete() {
+    const apiKey = await fetchApiKey();
+    if (!apiKey) {
+        console.error('API key not set');
+        return;
+    }
     const container = document.getElementById("autocomplete-container");
     
     addressAutocomplete(container, (data) => {
