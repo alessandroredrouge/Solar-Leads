@@ -13,8 +13,43 @@
 <body>
     <div class="flex-container">
         <button id="backToLogin" onclick="window.location.href='/'">Back to Login</button>
-        <h1>Select Your Role</h1>
+        <h1>Select a Predefined Character</h1>
+        <p class="data-tip"><strong>Tip:</strong> For the best demo experience, it's recommended choosing a predefined character. This allows you to explore the product's features with pre-populated data, giving you a clear view of how information is utilized across different roles and users. If you prefer, you can also create your own character by scrolling down.</p>
+        <div class="character-grid">
+            <div class="character-card" onclick="selectCharacter('Canvasser', 'Gastani Frinzi')">
+                <img src="{{ url_for('static', filename='images/canvasser.png') }}" alt="Canvasser">
+                <h3>Gastani Frinzi</h3>
+                <p>Canvasser</p>
+            </div>
+            <div class="character-card" onclick="selectCharacter('Canvasser', 'Leo Meo')">
+                <img src="{{ url_for('static', filename='images/canvasser.png') }}" alt="Canvasser">
+                <h3>Leo Meo</h3>
+                <p>Canvasser</p>
+            </div>
+            <div class="character-card" onclick="selectCharacter('Canvasser', 'Elise Bonjour')">
+                <img src="{{ url_for('static', filename='images/canvasser.png') }}" alt="Canvasser">
+                <h3>Elise Bonjour</h3>
+                <p>Canvasser</p>
+            </div>
+            <div class="character-card" onclick="selectCharacter('Team Leader', 'Stephany Wellingthon')">
+                <img src="{{ url_for('static', filename='images/team_leader.png') }}" alt="Team Leader">
+                <h3>Stephany Wellingthon</h3>
+                <p>Team Leader</p>
+            </div>
+            <div class="character-card" onclick="selectCharacter('Manager', 'Isaac Asimov')">
+                <img src="{{ url_for('static', filename='images/manager.png') }}" alt="Manager">
+                <h3>Isaac Asimov</h3>
+                <p>Manager</p>
+            </div>
+        </div>
+        
+        <h1>Select Your Own Character</h1>
+        <p class="data-tip"><strong>Tip:</strong> If you prefer, you can create your own character by entering a nickname below and selecting a role.</p>
         <form action="{{ url_for('role_selection') }}" method="post">
+            <div class="form-group">
+                <label for="nickname">Nickname</label>
+                <input type="text" id="nickname" name="nickname" required>
+            </div>
             <div class="role-selection">
                 <div class="role-option" style="text-align: center;">
                     <img src="{{ url_for('static', filename='images/canvasser.png') }}" alt="Canvasser" style="width: 100px; height: 100px; margin-bottom: 10px;">
@@ -29,41 +64,6 @@
                     <button type="submit" name="role" value="Manager" style="width: 300px">Manager</button>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" name="nickname" required>
-            </div>
-            <p class="data-tip"><strong>Tip:</strong> To fully experience this demo, please use one of the nicknames and corresponding roles from the table below. This will allow you to explore the product's features using the pre-populated dataset.</p>
-            <table border="1" cellpadding="5" cellspacing="0">
-            <thead>
-                <tr>
-                <th>Role</th>
-                <th>Nickname</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                <td>Canvasser</td>
-                <td>Gastani Frinzi</td>
-                </tr>
-                <tr>
-                <td>Canvasser</td>
-                <td>Leo Meo</td>
-                </tr>
-                <tr>
-                <td>Canvasser</td>
-                <td>Elise Bonjour</td>
-                </tr>
-                <tr>
-                <td>Team Leader</td>
-                <td>Stephany Wellingthon</td>
-                </tr>
-                <tr>
-                <td>Manager</td>
-                <td>[Any nickname]</td>
-                </tr>
-            </tbody>
-            </table>
         </form>
     </div>
 </body>

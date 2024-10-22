@@ -20,6 +20,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Functionality to select a predefined character in the role_selection.html
+function selectCharacter(role, nickname) {
+    // Create a form element
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/role_selection';  // Use the actual route, not url_for
+
+    // Create input fields for role and nickname
+    const roleInput = document.createElement('input');
+    roleInput.type = 'hidden';
+    roleInput.name = 'role';
+    roleInput.value = role;
+
+    const nicknameInput = document.createElement('input');
+    nicknameInput.type = 'hidden';
+    nicknameInput.name = 'nickname';
+    nicknameInput.value = nickname;
+
+    // Append inputs to form
+    form.appendChild(roleInput);
+    form.appendChild(nicknameInput);
+
+    // Append form to body and submit
+    document.body.appendChild(form);
+    form.submit();
+}
+
 
 // Functioning of the Hide / Unhide Form button in the Submission Form of data_collection.html
 document.addEventListener('DOMContentLoaded', function() {
