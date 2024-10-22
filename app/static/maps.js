@@ -23,17 +23,24 @@ const colorMap = {
 };
 
 // Function to fetch the API key
-async function fetchApiKey() {
-try {
-    const response = await fetch('/get-api-key');
-    const data = await response.json();
-    apiKey = data.apiKey;
-} catch (error) {
-    console.error('Error fetching API key:', error);
-}
+function fetchApiKey() {
+    return fetch('/get-api-key')
+        .then(response => response.json())
+        .then(data => data.apiKey)
+        .catch(error => {
+            console.error('Error fetching API key:', error);
+            return null;
+        });
 }
 
-function initMap() {
+
+async function initMap() {
+    const apiKey = await fetchApiKey();
+    if (!apiKey) {
+        console.error('API key not set');
+        return;
+    }
+    
     map = L.map('map').setView([-28.0167, 153.4000], 11);
 
     const isRetina = L.Browser.retina;
@@ -553,13 +560,12 @@ function initAutocomplete() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    fetchApiKey();
     if (document.getElementById('map')) {
-        fetchApiKey();
         initMap();
         initVisibleResponses();
     }
     if (document.getElementById('address')) {
-        fetchApiKey();
         initAutocomplete();
     }
 });
