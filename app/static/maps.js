@@ -107,6 +107,16 @@ async function initMap() {
         classes: 'address-search-control'
     }).addTo(map);
 
+    // Add full-screen toggle button
+    const fullscreenControl = L.control({position: 'topleft'});
+    fullscreenControl.onAdd = function(map) {
+        const button = L.DomUtil.create('button', 'fullscreen-button');
+        button.innerHTML = '&#x26F6;'; // Unicode for 'enter fullscreen' icon
+        button.onclick = toggleFullScreen;
+        return button;
+    };
+    fullscreenControl.addTo(map);
+
     initAutocomplete();
 
     fetchMapData();
@@ -316,6 +326,37 @@ function toggleMarkers(response) {
             checkbox.checked = visibleResponses.has(resp);
         }
     });
+}
+
+function toggleFullScreen() {
+    const mapElement = document.getElementById('map');
+    const fullscreenButton = document.querySelector('.fullscreen-button');
+
+    if (!document.fullscreenElement) {
+        if (mapElement.requestFullscreen) {
+            mapElement.requestFullscreen();
+        } else if (mapElement.mozRequestFullScreen) { // Firefox
+            mapElement.mozRequestFullScreen();
+        } else if (mapElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            mapElement.webkitRequestFullscreen();
+        } else if (mapElement.msRequestFullscreen) { // IE/Edge
+            mapElement.msRequestFullscreen();
+        }
+        mapElement.classList.add('map-fullscreen');
+        fullscreenButton.innerHTML = '&#x26F6;'; // Unicode for 'exit fullscreen' icon
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+            document.msExitFullscreen();
+        }
+        mapElement.classList.remove('map-fullscreen');
+        fullscreenButton.innerHTML = '&#x26F6;'; // Unicode for 'enter fullscreen' icon
+    }
 }
 
 async function initVisibleResponses() {
