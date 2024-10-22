@@ -28,14 +28,10 @@ try {
     const response = await fetch('/get-api-key');
     const data = await response.json();
     apiKey = data.apiKey;
-    initMap(); // Call initMap after getting the API key
 } catch (error) {
     console.error('Error fetching API key:', error);
 }
 }
-
-// Call this function when the script loads
-fetchApiKey();
 
 function initMap() {
     map = L.map('map').setView([-28.0167, 153.4000], 11);
@@ -558,10 +554,12 @@ function initAutocomplete() {
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('map')) {
+        fetchApiKey();
         initMap();
         initVisibleResponses();
     }
     if (document.getElementById('address')) {
+        fetchApiKey();
         initAutocomplete();
     }
 });
