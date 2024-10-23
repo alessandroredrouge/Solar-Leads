@@ -207,6 +207,84 @@ const aiPoweredResponses = [
     'No answer - worth returning (AI powered feature)'
 ];
 
+let touchStartY = 0;
+let touchEndY = 0;
+const minSwipeDistance = 10; // minimum distance for a swipe to be registered
+
+function handleTouchStart(e) {
+    touchStartY = e.touches[0].clientY;
+}
+
+function handleTouchMove(e) {
+    touchEndY = e.touches[0].clientY;
+}
+
+function handleTouchEnd(e) {
+    if (Math.abs(touchEndY - touchStartY) > minSwipeDistance) {
+        // This was a swipe, not a tap
+        return;
+    }
+    const response = e.target.closest('.legend-item').dataset.response;
+    toggleMarkers(response);
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+const debouncedToggleMarkers = debounce(toggleMarkers, 250);
+
+function toggleMarkers(response) {
+    if (visibleResponses.has(response)) {
+        visibleResponses.delete(response);
+    } else {
+        visibleResponses.add(response);
+    }
+
+    updateMarkerVisibility();
+    updateLegendItemState(response);
+}
+
+function updateMarkerVisibility() {
+    if (clusteringEnabled) {
+        markerCluster.clearLayers();
+        markers.forEach(({marker, response}) => {
+            if (visibleResponses.has(response)) {
+                markerCluster.addLayer(marker);
+            }
+        });
+    } else {
+        markers.forEach(({marker, response}) => {
+            if (visibleResponses.has(response)) {
+                map.addLayer(marker);
+            } else {
+                map.removeLayer(marker);
+            }
+        });
+    }
+}
+
+function updateLegendItemState(response) {
+    const legendItem = document.querySelector(`.legend-item[data-response="${response}"]`);
+    if (legendItem) {
+        const checkbox = legendItem.querySelector('input[type="checkbox"]');
+        const textSpan = legendItem.querySelector('.legend-text');
+        const isVisible = visibleResponses.has(response);
+        
+        checkbox.checked = isVisible;
+        textSpan.style.textDecoration = isVisible ? 'none' : 'line-through';
+        textSpan.style.opacity = isVisible ? '1' : '0.5';
+    }
+}
+
 function createLegend() {
     const legend = document.getElementById('map-legend');
     legend.innerHTML = '<h4>Prospect Response</h4>'; // Clear existing content
@@ -214,6 +292,7 @@ function createLegend() {
     Object.entries(colorMap).forEach(([key, color]) => {
         const row = document.createElement('div');
         row.className = 'legend-item';
+        row.dataset.response = key;
         
         // Create SVG marker
         const svgNS = "http://www.w3.org/2000/svg";
@@ -250,10 +329,22 @@ function createLegend() {
         
         row.appendChild(svg);
         row.innerHTML += `
-            <span class="legend-text" onclick="toggleMarkers('${key}')">${key}</span>
-            <input type="checkbox" checked onchange="toggleMarkers('${key}')">
+            <span class="legend-text">${key}</span>
+            <input type="checkbox" checked>
         `;
         legend.appendChild(row);
+
+        // Add touch event listeners for mobile devices
+        row.addEventListener('touchstart', handleTouchStart, false);
+        row.addEventListener('touchmove', handleTouchMove, false);
+        row.addEventListener('touchend', handleTouchEnd, false);
+
+        // Add click event listener for desktop devices
+        row.addEventListener('click', (e) => {
+            if (e.target !== row.querySelector('input[type="checkbox"]')) {
+                debouncedToggleMarkers(key);
+            }
+        });
     });
     initVisibleResponses();
 }
@@ -291,52 +382,6 @@ function toggleClustering() {
     // Update button text
     const button = document.getElementById('clustering-toggle');
     button.textContent = clusteringEnabled ? 'Disable Clustering' : 'Enable Clustering';
-}
-
-function toggleMarkers(response) {
-    let responsesToToggle = [response];
-
-    responsesToToggle.forEach(resp => {
-        if (visibleResponses.has(resp)) {
-            visibleResponses.delete(resp);
-        } else {
-            visibleResponses.add(resp);
-        }
-    });
-
-    if (clusteringEnabled) {
-        markers.forEach(({marker}) => {
-            map.removeLayer(marker); // Remove all individual markers
-        });
-        markerCluster.clearLayers();
-        markers.forEach(({marker, response: markerResponse}) => {
-            if (visibleResponses.has(markerResponse)) {
-                markerCluster.addLayer(marker);
-            }
-        });
-    } else {
-        markers.forEach(({marker, response: markerResponse}) => {
-            if (visibleResponses.has(markerResponse)) {
-                map.addLayer(marker);
-            } else {
-                map.removeLayer(marker);
-            }
-        });
-    }
-
-    // Update checkbox state and text style for all affected responses
-    responsesToToggle.forEach(resp => {
-        const legendItem = document.querySelector(`.legend-item:has(input[onchange="toggleMarkers('${resp}')"])`);
-        if (legendItem) {
-            const checkbox = legendItem.querySelector('input[type="checkbox"]');
-            const textSpan = legendItem.querySelector('.legend-text');
-            const isVisible = visibleResponses.has(resp);
-            
-            checkbox.checked = isVisible;
-            textSpan.style.textDecoration = isVisible ? 'none' : 'line-through';
-            textSpan.style.opacity = isVisible ? '1' : '0.5';
-        }
-    });
 }
 
 function toggleFullScreen() {
