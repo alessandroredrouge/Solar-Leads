@@ -8,6 +8,7 @@ let visibleResponses = new Set();
 let legendVisible = true;
 let clusteringEnabled = true;
 let tempMarker;
+let isFullscreen = false;
 
 const colorMap = {
     'Appointment set': '%23008000',
@@ -343,32 +344,53 @@ function toggleFullScreen() {
     const fullscreenButton = document.querySelector('.fullscreen-button');
     const fullscreenIcon = fullscreenButton.querySelector('.fullscreen-icon use');
 
-    if (!document.fullscreenElement) {
+    isFullscreen = !isFullscreen;
+
+    if (isFullscreen) {
         if (mapElement.requestFullscreen) {
             mapElement.requestFullscreen();
-        } else if (mapElement.mozRequestFullScreen) { // Firefox
+        } else if (mapElement.mozRequestFullScreen) {
             mapElement.mozRequestFullScreen();
-        } else if (mapElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        } else if (mapElement.webkitRequestFullscreen) {
             mapElement.webkitRequestFullscreen();
-        } else if (mapElement.msRequestFullscreen) { // IE/Edge
+        } else if (mapElement.msRequestFullscreen) {
             mapElement.msRequestFullscreen();
         }
-        mapElement.classList.add('map-fullscreen');
-        fullscreenIcon.setAttribute('xlink:href', '#fullscreen-exit-icon');
     } else {
         if (document.exitFullscreen) {
             document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) { // Firefox
+        } else if (document.mozCancelFullScreen) {
             document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+        } else if (document.webkitExitFullscreen) {
             document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) { // IE/Edge
+        } else if (document.msExitFullscreen) {
             document.msExitFullscreen();
         }
-        mapElement.classList.remove('map-fullscreen');
-        fullscreenIcon.setAttribute('xlink:href', '#fullscreen-enter-icon');
+    }
+
+    updateFullscreenState();
+}
+
+function updateFullscreenState() {
+    const mapElement = document.getElementById('map');
+    const fullscreenButton = document.querySelector('.fullscreen-button');
+    const fullscreenIcon = fullscreenButton.querySelector('.fullscreen-icon use');
+
+    fullscreenIcon.setAttribute('xlink:href', isFullscreen ? '#fullscreen-exit-icon' : '#fullscreen-enter-icon');
+    mapElement.classList.toggle('map-fullscreen', isFullscreen);
+
+    // Force a resize event on the map to update its size
+    if (map) {
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 300);
     }
 }
+
+document.addEventListener('fullscreenchange', updateFullscreenState);
+document.addEventListener('webkitfullscreenchange', updateFullscreenState);
+document.addEventListener('mozfullscreenchange', updateFullscreenState);
+document.addEventListener('MSFullscreenChange', updateFullscreenState);
 
 async function initVisibleResponses() {
     const apiKey = await fetchApiKey();
